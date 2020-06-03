@@ -1,0 +1,71 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Cadastrar Produto
+@endsection
+
+@section('content')
+
+<h1>Cadastrar Produto</h1>
+
+<div class="teste-container">
+    <form action="{{ route('store.produto') }}" method="POST">
+        {{ csrfField() }}
+
+        <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+
+        <label for="codigo">Código</label>
+        <input class="form-control" type="text" name="codigo" value="{{ old('codigo', '') }}" maxlength="10">
+        @if(hasErrorFor('codigo'))
+            <span>
+                {{ getErrorFor('codigo') }}
+            </span>
+        @endif
+
+        <label for="nome">Nome</label>
+        <input class="form-control" type="text" name="nome" value="{{ old('nome', '') }}" maxlength="80">
+        @if(hasErrorFor('nome'))
+            <span>
+                {{ getErrorFor('nome') }}
+            </span>
+        @endif
+
+        <label for="descricao">Descrição / Ingredientes</label>
+        <textarea class="form-control" name="descricao" rows="8" maxlength="200">{{ old('descricao', '') }}</textarea>
+        @if(hasErrorFor('descricao'))
+            <span>
+                {{ getErrorFor('descricao') }}
+            </span>
+        @endif
+
+        <label for="custo">Custo</label>
+        <input class="form-control" type="number" name="custo" value="{{ old('custo', '') }}" min="0,00" max="9999,00" step="0.01">
+        @if(hasErrorFor('custo'))
+            <span>
+                {{ getErrorFor('custo') }}
+            </span>
+        @endif
+
+        <label for="precoVenda">Preço de Venda</label>
+        <input class="form-control" type="number" name="precoVenda" value="{{ old('precoVenda', '') }}" min="0,00" max="9999,00" step="0.01">
+        @if(hasErrorFor('precoVenda'))
+            <span>
+                {{ getErrorFor('precoVenda') }}
+            </span>
+        @endif
+
+        @if(flashMessage('storeProdutoError'))
+            <p></p>
+            <span>{{ flashMessage('storeProdutoError') }}</span>
+        @endif
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+@endsection

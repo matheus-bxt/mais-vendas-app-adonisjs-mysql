@@ -1,0 +1,66 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Mesas
+@endsection
+
+@section('content')
+
+<img align="left" src="/img/table-icon.png" width="80">
+<h1 style="padding: 15px 0 15px 100px">Mesas</h1>
+
+<p><a href="{{ route('view.cadastrarMesa') }}" type="button" class="btn btn-success">Cadastrar nova mesa</a></p>
+<table class="table table-bordered table-hover table-striped">
+    <thead class="thead-dark">
+        <th class="text-center" style="width: 100px">Mesa nº</th>
+        <th class="text-center" style="width: 150px">Status</th>
+        <th class="text-center" style="width: 230px">Pedido</th>
+        <th>Nome da Mesa</th>        
+        <th class="text-center" style="width: 130px">Ações</th>
+    </thead>
+
+    @if(mesas.length > 0)
+        <tbody>
+            @each(mesa in mesas)
+                <!--<tr style="font-weight: bold; {{ mesa.status.codigo == 1 ? 'color: green;' : 'color: orange;' }}">!-->
+                <tr>
+                    <td class="text-center">{{ mesa.numero }}</td>
+                    <td class="text-center">{{ mesa.status.nome }}</td>
+                    <td class="text-center">
+                        @if(mesa.status.codigo == 1)
+                            <a type="button" href="" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="right">Cadastrar pedido</a>
+                        @else
+                            <a type="button" href="" type="button" class="btn btn-warning" style="background-color: orange;" data-toggle="tooltip" data-placement="right">Gerenciar pedido</a>
+                        @endif
+                    </td>
+                    <td>{{ mesa.nome }}</td>
+                    <td class="text-center">                        
+                        <a type="button" href="{{ route('view.alterarMesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar mesa">
+                            <i class="fas fa-edit fa-sm"></i>
+                        </a>
+                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir mesa">
+                            <i class="far fa-trash-alt fa-sm"></i>
+                        </a>
+                    </td>
+                </tr>                    
+            @endeach
+        </tbody>
+    @endif
+</table>
+
+@if(flashMessage('openToEditMesaError'))
+    <p></p>
+    <span>{{ flashMessage('openToEditMesaError') }}</span>
+@endif
+
+@if(flashMessage('adminOnlyError'))
+    <p></p>
+    <span>{{ flashMessage('adminOnlyError') }}</span>
+@endif
+
+@endsection

@@ -1,0 +1,54 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Alterar Filial
+@endsection
+
+@section('content')
+
+<h1>Alterar Filial</h1>
+
+<form action="{{ route('update.filial', { filial_id: filial.id }) }}?_method=PUT" method="POST">
+    {{ csrfField() }}
+
+    <label for="nome">Nome</label>
+    <input type="text" name="nome" value="{{ old('nome', filial.nome) }}" maxlength="80">
+    @if(hasErrorFor('nome'))
+        <span>
+            {{ getErrorFor('nome') }}
+        </span>
+    @endif
+
+    <label for="cnpj">CNPJ</label>
+    <input type="text" name="cnpj" value="{{ old('cnpj', filial.cnpj) }}" maxlength="14">
+    @if(hasErrorFor('cnpj'))
+        <span>
+            {{ getErrorFor('cnpj') }}
+        </span>
+    @endif
+
+    <label for="telefone">Telefone</label>
+    <input type="text" name="telefone" value="{{ old('telefone', filial.telefone) }}" maxlength="14">
+    @if(hasErrorFor('telefone'))
+        <span>
+            {{ getErrorFor('telefone') }}
+        </span>
+    @endif
+
+    <label for="endereco">Endereço</label>
+    <input type="text" name="endereco" value="{{ old('endereco', filial.endereco) }}" maxlength="200">
+    @if(hasErrorFor('endereco'))
+        <span>
+            {{ getErrorFor('endereco') }}
+        </span>
+    @endif
+
+    <button type="submit">Salvar</button>
+</form>
+
+@endsection

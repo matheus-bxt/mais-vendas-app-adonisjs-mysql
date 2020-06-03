@@ -1,0 +1,55 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Cadastrar Despesa
+@endsection
+
+@section('content')
+
+<h1>Cadastrar Despesa</h1>
+
+<div class="teste-container">
+    <form action="{{ route('store.despesa') }}" method="POST">
+        {{ csrfField() }}
+
+        <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+
+        <label for="descricao">Descrição</label>
+        <input class="form-control" type="text" name="descricao" value="{{ old('descricao', '') }}" maxlength="80">
+        @if(hasErrorFor('descricao'))
+            <span>
+                {{ getErrorFor('descricao') }}
+            </span>
+        @endif
+
+        <label for="data">Data</label>
+        <input id="inputData" class="form-control" type="date" name="data" value="{{ old('data', '') }}" maxlength="10">
+        @if(hasErrorFor('data'))
+            <span>
+                {{ getErrorFor('data') }}
+            </span>
+        @endif
+
+        <label for="valor">Valor</label>
+        <input class="form-control" type="number" name="valor" value="{{ old('valor', '') }}" min="0,00" max="9999,00" step="0.01">
+        @if(hasErrorFor('valor'))
+            <span>
+                {{ getErrorFor('valor') }}
+            </span>
+        @endif
+
+        @if(flashMessage('storeDespesaError'))
+            <p></p>
+            <span>{{ flashMessage('storeDespesaError') }}</span>
+        @endif
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+@endsection

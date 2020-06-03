@@ -1,0 +1,21 @@
+.container {
+    margin-top: 150px;
+    /* margin: 100px 50px 50px 50px; */
+}
+
+.navbar-color {
+    background-color: black !important;
+}
+
+.navbar-nav {
+    font-size: large !important;
+    font-weight: bold;
+}
+
+.navbar-nav > li:hover > a {
+    color: white !important;
+}
+
+/* .navbar-nav > li.active > a {
+    font-size: x-large !important;
+} */

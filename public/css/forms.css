@@ -1,0 +1,72 @@
+.teste-container {
+    grid-template-columns: auto;
+    padding: 2em;
+    width: 50%;
+    border: 1px solid rgba(9, 50, 94, 100);
+    border-radius: 5px;
+}
+
+label {
+    font-weight: bold;
+    margin-top: 0;
+    margin: 10px 0 0 0;
+}
+
+input[type='text'], input[type='email'], input[type='password'] {
+    /* width: calc(100% - 4em); */
+    display: block;
+    padding: .5em;
+    /* margin-bottom: 20px; */
+    border: 2px solid lightgray;
+}
+
+input[type='checkbox'] {
+    display: block;
+    padding: .5em;
+    margin: 10px 0 0 20px;
+    transform: scale(1.7);    
+}
+
+select {
+    width: calc(100% - 2.7em);
+    display: block;
+    padding: .5em;
+    border: 2px solid lightgray;
+}
+
+a.primeiroLogin {
+    /* width: calc(100% - 4em);     */
+    padding: .5em;
+    /* margin-bottom: 20px; */
+}
+
+/* Change the white to any color ;) */
+/* input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+} */
+
+button {
+    padding: .5em !important;
+    background: rgba(9, 50, 94, 100);
+    border: 0;
+    color: white;
+    font-size: 1.2em;
+    font-family: 'Montserrat';
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 40px;
+    cursor: pointer;
+}
+
+span {
+    display: block;
+    background: yellow;
+    padding: .3em;
+    margin: 5px 5px;
+}
+
+
+/* th {
+    background-color: rgba(9, 50, 94, 100) !important;
+} */

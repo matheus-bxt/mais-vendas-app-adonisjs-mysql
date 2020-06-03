@@ -1,0 +1,14 @@
+@layout('layouts.main')
+
+@section('title')
+MaisVendas - Início
+@endsection
+
+@section('content')
+    <h1>Início</h1>
+
+    @loggedIn
+        {{ filialLogada.nome }}
+        <p>Bem vindo {{ auth.user.nome }}! <a href="/api/logout">Clique aqui</a> para sair.</p>          
+    @endloggedIn
+@endsection

@@ -1,0 +1,63 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.containerContent {
+    width: calc(100% - 4em);
+    padding: 2em;
+    margin-top: 4em;
+}
+
+body {
+    font-weight: 300;
+    background-color: #EFEFEF;
+}
+  
+* {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #303C49;
+    display: grid;
+    grid-template-columns: 14em auto;
+}
+
+.navbar-color {
+    background-color: rgba(9, 50, 94, 100) !important;
+}
+
+.navbar-nav {
+    font-size: large !important;
+    font-weight: bold;
+}
+
+.nav-item {
+    padding-right: 20px;
+}
+
+/* .navbar-nav > li:hover > a {
+    color: white !important;
+} */
+
+nav ul li a:hover {    
+    background: #455668;
+}
+
+#filialLogada {
+    color: rgba(27, 193, 169, 100);
+}
+
+h1 {
+    margin-bottom: 1em;
+}
+
+#logo {
+    margin: 0 20px 0 10px;
+}
+
+/* .navbar-nav > li.active > a {
+    font-size: x-large !important;
+} */

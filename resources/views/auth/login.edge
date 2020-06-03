@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" href="/img/title-icon.png">
+        <title>Login</title>
+
+        <!-- Principal JS do Bootstrap -->
+        {{ script('/js/bootstrap.min.js') }}
+
+        <!-- Principal CSS do Bootstrap -->
+        {{ style('/bootstrap/bootstrap.min.css') }}
+
+        <!-- Font-Awesome -->
+        {{ style('/font-awesome/css/all.css') }}
+
+        <!-- Estilos customizados para esse template -->
+        {{ style('/css/login.css') }}
+
+    </head>
+    <body class="text-center">        
+        <form class="form-login" action="{{ route('UserController.login') }}" method="POST">
+        <img class="mb-2" src="/img/logo-icon.svg" alt="" width="200" height="200">
+        <h1 class="h3 mb-4 font-weight-large">Faça o login</h1>
+        {{ csrfField() }}
+
+        <div class="input-group">
+            <select name="filial" id="inputFilial" class="form-control">
+                <option value="" disabled selected hidden>Selecione uma filial</option>
+            @each(filial in filiais)
+                <option value="{{ filial.id }}" {{ old('filial') == filial.id ? 'selected' : '' }}>{{ filial.nome }}</option>
+            @endeach
+            </select>
+            @if(filiais.length == 0)
+                <div class="input-group-btn">
+                    <a href="/primeiraFilial" type="button" class="btn btn-success buttonPrimeiroLogin" data-toggle="tooltip" data-placement="right" title="Cadastrar primeira filial"><i class="fas fa-plus-square i-primeiroLogin"></i></a>
+                </div>
+            @endif
+        </div>
+        @if(hasErrorFor('filial'))
+            <span>
+                {{ getErrorFor('filial') }}
+            </span>
+        @endif
+
+        <div class="input-group">
+            @if(filiais.length > 0 && usuarios.length == 0)
+                <input type="text" name="login" value="{{ old('login', '') }}" id="inputLogin" class="form-control" placeholder="Login" disabled>
+                <div class="input-group-btn">
+                    <a href="/primeiroUsuario" type="button" class="btn btn-success buttonPrimeiroLogin" data-toggle="tooltip" data-placement="right" title="Cadastrar primeiro usuário"><i class="fas fa-plus-square i-primeiroLogin"></i></a>
+                </div>
+            @else
+                <input type="text" name="login" value="{{ old('login', '') }}" id="inputLogin" class="form-control" placeholder="Login">
+            @endif
+        </div>
+        @if(hasErrorFor('login'))
+            <span>
+                {{ getErrorFor('login') }}
+            </span>
+        @endif
+
+        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Senha">
+        @if(hasErrorFor('password'))
+            <span>
+                {{ getErrorFor('password') }}
+            </span>
+        @endif
+
+        @if(flashMessage('loginError'))
+            <p></p>
+            <span>{{ flashMessage('loginError') }}</span>
+        @endif
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
+        <p></p>
+        <p class="mt-5 mb-3 text-muted">MaisVendas &copy; 2020</p>
+      </form>
+    </body>
+</html>

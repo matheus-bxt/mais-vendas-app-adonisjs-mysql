@@ -1,0 +1,86 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Alterar Usuário
+@endsection
+
+@section('content')
+
+<h1>Alterar Usuário</h1>
+
+<form action="{{ route('update.usuario', { usuario_id: usuario.id }) }}?_method=PUT" method="POST">
+    {{ csrfField() }}
+
+    <label for="filial_id">Filial</label>
+    <select name="filial_id">
+        @each(filial in filiais)
+            @if(usuario.filial_id == filial.id)
+                <option selected value={{filial.id}}>{{filial.nome}}</option>
+            @else
+                <option value={{filial.id}}>{{filial.nome}}</option>
+            @endif
+        @endeach
+    </select>
+    @if(hasErrorFor('filial_id'))
+        <span>
+            {{ getErrorFor('filial_id') }}
+        </span>
+    @endif 
+
+    <label for="nome">Nome</label>
+    <input type="text" name="nome" value="{{ old('nome', usuario.nome) }}" maxlength="80">
+    @if(hasErrorFor('nome'))
+        <span>
+            {{ getErrorFor('nome') }}
+        </span>
+    @endif
+
+    <label for="login">Login</label>
+    <input type="text" name="login" value="{{ old('login', usuario.login) }}" maxlength="20">
+    @if(hasErrorFor('login'))
+        <span>
+            {{ getErrorFor('login') }}
+        </span>
+    @endif
+
+    <label for="alterarSenha">Alterar Senha?</label>
+    <input type="checkbox" name="alterarSenha" id="alterarSenha" {{ old('alterarSenha') == 'on' ? 'checked' : '' }}>
+    <p></p>
+
+    <label {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="labelNovaSenha" for="password">Nova Senha</label>
+    <input {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="inputNovaSenha" type="password" name="password" value="{{ old('password', '') }}" maxlength="20">
+    @if(hasErrorFor('password'))
+        <span>
+            {{ getErrorFor('password') }}
+        </span>
+    @endif
+
+    <label {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="labelConfirmarSenha" for="confirmPassword">Confirmar Senha</label>
+    <input {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="inputConfirmarSenha" type="password" name="confirmPassword" value="{{ old('confirmPassword', '') }}" maxlength="20">
+    @if(hasErrorFor('confirmPassword'))
+        <span>
+            {{ getErrorFor('confirmPassword') }}
+        </span>
+    @endif
+
+    <label for="admin">Admin?</label>
+    <input type="checkbox" name="admin" id="admin" {{ old('admin') == 'on' ? 'checked' : '' }} {{ usuario.admin == 1 ? 'checked' : '' }}>
+
+    <button type="submit">Salvar</button>
+</form>
+
+<script>
+    $('#alterarSenha').change(function() {
+        $("#labelNovaSenha").prop("hidden", !this.checked);
+        $("#inputNovaSenha").prop("hidden", !this.checked);
+        $("#labelConfirmarSenha").prop("hidden", !this.checked);
+        $("#inputConfirmarSenha").prop("hidden", !this.checked);
+})
+</script>
+
+@endsection

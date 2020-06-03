@@ -1,0 +1,47 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Alterar Mesa
+@endsection
+
+@section('content')
+
+<h1>Alterar Mesa</h1>
+
+<div class="teste-container">
+    <form action="{{ route('update.mesa', { mesa_id: mesa.id }) }}?_method=PUT" method="POST">
+        {{ csrfField() }}
+
+        <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+
+        <label for="numero">Número</label>
+        <input class="form-control" type="number" name="numero" value="{{ old('numero', mesa.numero) }}" min="1" max="999" step="1">
+        @if(hasErrorFor('numero'))
+            <span>
+                {{ getErrorFor('numero') }}
+            </span>
+        @endif
+
+        <label for="nome">Nome</label>
+        <input class="form-control" type="text" name="nome" value="{{ old('nome', mesa.nome) }}" maxlength="80">
+        @if(hasErrorFor('nome'))
+            <span>
+                {{ getErrorFor('nome') }}
+            </span>
+        @endif
+
+        @if(flashMessage('adminOnlyError'))
+            <p></p>
+            <span>{{ flashMessage('adminOnlyError') }}</span>
+        @endif
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+@endsection

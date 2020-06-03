@@ -1,0 +1,99 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Cadastrar Usuário
+@endsection
+
+@section('content')
+
+@if(usuarios == null || usuarios.length == 0)
+<h1>Cadastrar Primeiro Usuário</h1>
+@else
+<h1>Cadastrar Usuário</h1>
+@endif
+
+<div class="teste-container">
+    @loggedIn
+        <form action="{{ route('store.usuario') }}" method="POST">
+    @else
+        <form action="{{ route('storeFirst.usuario') }}" method="POST">
+    @endloggedIn
+        {{ csrfField() }}
+
+        <label for="filial_id">Filial</label>
+        <select class="form-control" name="filial_id">
+            @each(filial in filiais)
+                <option value="{{ filial.id }}" {{ old('filial_id') == filial.id ? 'selected' : '' }}>{{ filial.nome }}</option>
+            @endeach
+            @if(filiais == null || filiais.length == 0)
+            <option hidden value="0"></option>
+            @endif
+        </select>
+        @if(hasErrorFor('filial_id'))
+            <span>
+                {{ getErrorFor('filial_id') }}
+            </span>
+        @endif 
+
+        <label for="nome">Nome</label>
+        <input class="form-control" type="text" name="nome" value="{{ old('nome', '') }}" maxlength="80">
+        @if(hasErrorFor('nome'))
+            <span>
+                {{ getErrorFor('nome') }}
+            </span>
+        @endif
+
+        <label for="login">Login</label>
+        <input class="form-control" type="text" name="login" value="{{ old('login', '') }}" maxlength="20">
+        @if(hasErrorFor('login'))
+            <span>
+                {{ getErrorFor('login') }}
+            </span>
+        @endif
+
+        <label for="password">Senha</label>
+        <input class="form-control" type="password" name="password" value="{{ old('password', '') }}" maxlength="20">
+        @if(hasErrorFor('password'))
+            <span>
+                {{ getErrorFor('password') }}
+            </span>
+        @endif
+
+        <label for="confirmPassword">Confirmar Senha</label>
+        <input class="form-control" type="password" name="confirmPassword" value="{{ old('confirmPassword', '') }}" maxlength="20">
+        @if(hasErrorFor('confirmPassword'))
+            <span>
+                {{ getErrorFor('confirmPassword') }}
+            </span>
+        @endif
+
+        @if(usuarios.length > 0)            
+            <label for="admin">Admin?</label>
+            <input type="checkbox" name="admin" id="admin" {{ old('admin') == 'on' ? 'checked' : '' }}>
+        @endif
+
+        @if(flashMessage('storeFirstUserWithoutFilialError'))
+            <p></p>
+            <span>{{ flashMessage('storeFirstUserWithoutFilialError') }} <a href="/primeiraFilial">Clique aqui</a> para criar a primeira filial</span>
+        @endif
+
+        @if(flashMessage('storeFirstUserAlreadyBeenCreatedError'))
+            <p></p>
+            <span>{{ flashMessage('storeFirstUserAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span>
+        @endif
+
+        @if(flashMessage('storeUserError'))
+            <p></p>
+            <span>{{ flashMessage('storeUserError') }}</span>
+        @endif
+
+        <button type="submit" onclick="teste()">Salvar</button>
+    </form>
+</div>
+
+@endsection
