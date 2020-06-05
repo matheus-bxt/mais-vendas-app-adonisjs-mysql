@@ -74,10 +74,6 @@ class MesaController {
   }
 
   async alterarMesaView({ view, params, session, response, auth }) {
-    if (!auth.user.admin) {
-
-    }
-
     var mesa = await Mesa.findBy('id', params.mesa_id);
     if (mesa == null) {
       //retorna mensagem de erro para informar não foi encontrada a mesa com o id informado

@@ -1,7 +1,5 @@
 'use strict'
 
-const Filial = use('App/Models/Filial');
-
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -47,12 +45,18 @@ Route.group('userauth', () => {
         Route.get('/cadastrarMesa', 'MesaController.cadastrarMesaView').as('view.cadastrarMesa');
         Route.get('/alterarMesa/:mesa_id', 'MesaController.alterarMesaView').as('view.alterarMesa').middleware(['admin']);
 
+        //PEDIDOS
+        Route.get('/pedidos', 'PedidoController.pedidosView').as('view.pedidos');
+        Route.get('/cadastrarPedido/:mesaSelecionadaId?', 'PedidoController.cadastrarPedidoView').as('view.cadastrarPedido');
+        Route.get('/alterarPedido/:pedido_id', 'PedidoController.alterarPedidoView').as('view.alterarPedido');
+
     //CREATE
         Route.post('/cadastrarFilial', 'FilialController.store').as('store.filial').prefix('api').validator('CreateFilial').middleware(['admin']);
         Route.post('/cadastrarUsuario', 'UserController.store').as('store.usuario').prefix('api').validator('CreateUser').middleware(['admin']);
         Route.post('/cadastrarDespesa', 'DespesaController.store').as('store.despesa').prefix('api').validator('CreateDespesa').middleware(['admin']);
         Route.post('/cadastrarProduto', 'ProdutoController.store').as('store.produto').prefix('api').validator('CreateProduto').middleware(['admin']);
         Route.post('/cadastrarMesa', 'MesaController.store').as('store.mesa').prefix('api').validator('CreateMesa');
+        Route.post('/cadastrarPedido/:mesaSelecionadaId?', 'PedidoController.store').as('store.pedido').prefix('api').validator('CreatePedido');
 
     //UPDATE
         Route.put('/alterarFilial/:filial_id', 'FilialController.update').as('update.filial').prefix('api').validator('CreateFilial').middleware(['admin']);
@@ -60,6 +64,7 @@ Route.group('userauth', () => {
         Route.put('/alterarDespesa/:despesa_id', 'DespesaController.update').as('update.despesa').prefix('api').validator('CreateDespesa').middleware(['admin']);
         Route.put('/alterarProduto/:produto_id', 'ProdutoController.update').as('update.produto').prefix('api').validator('CreateProduto').middleware(['admin']);
         Route.put('/alterarMesa/:mesa_id', 'MesaController.update').as('update.mesa').prefix('api').validator('CreateMesa').middleware(['admin']);
+        Route.put('/alterarPedido/:pedido_id', 'PedidoController.update').as('update.pedido').prefix('api').validator('CreatePedido');
 
     //LOGOUT
         Route.get('/logout', async ({ auth, response }) => {

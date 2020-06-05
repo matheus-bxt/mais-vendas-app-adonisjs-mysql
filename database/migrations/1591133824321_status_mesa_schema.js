@@ -6,8 +6,7 @@ const Schema = use('Schema')
 class StatusMesaSchema extends Schema {
   up () {
     this.create('status_mesas', (table) => {
-      table.increments()
-      table.integer('codigo').notNullable().unique()
+      table.integer('id').primary()
       table.string('nome', 40).notNullable()
       table.timestamps()
     })

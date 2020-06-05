@@ -10,7 +10,7 @@ class MesaSchema extends Schema {
       table.integer('numero').notNullable()
       table.string('nome', 80).notNullable()
       table.integer('filial_id').unsigned().notNullable().references('id').inTable('filials')
-      table.integer('status_id').unsigned().notNullable().references('id').inTable('status_mesas')
+      table.integer('status_id').notNullable().references('id').inTable('status_mesas')
       table.unique(['numero', 'filial_id'])
       table.timestamps()
     })

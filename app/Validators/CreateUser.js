@@ -5,7 +5,7 @@ class CreateUser {
     var usuario_id = this.ctx.params.usuario_id;
 
     const { alterarSenha } = this.ctx.request.all();
-    if(alterarSenha == 'on') {
+    if(alterarSenha == 'on' || usuario_id == null) {
       return {
         'filial_id': 'required',
         'nome': 'required|max:80',

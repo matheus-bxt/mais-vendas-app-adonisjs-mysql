@@ -78,8 +78,28 @@ class FilialController {
       session.flash({storeFirstFilialAlreadyBeenCreatedError: 'A primeira filial do sistema já foi criada! Para criar novas filiais, faça o login com um usuário administrador.'});
       return response.redirect('/primeiraFilial');
     }
+
+    this.runScripts();
     
     return response.redirect('/');
+  }
+
+  async runScripts() {
+    const Database = use('Database');
+    
+    await Database.table('status_mesas').insert({ id: 1, nome: 'Vazia' })
+    await Database.table('status_mesas').insert({ id: 2, nome: 'Ocupada' })
+
+    await Database.table('status_pedidos').insert({ id: 1, nome: 'Novo' })
+    await Database.table('status_pedidos').insert({ id: 2, nome: 'Em preparo' })
+    await Database.table('status_pedidos').insert({ id: 3, nome: 'Pronto' })
+    await Database.table('status_pedidos').insert({ id: 4, nome: 'Saiu para entrega' })
+    await Database.table('status_pedidos').insert({ id: 5, nome: 'Entregue' })
+    await Database.table('status_pedidos').insert({ id: 6, nome: 'Pago' })
+    
+    await Database.table('tipo_pedidos').insert({ id: 1, nome: 'Consumir no local' })
+    await Database.table('tipo_pedidos').insert({ id: 2, nome: 'Retirar no balcão' })
+    await Database.table('tipo_pedidos').insert({ id: 3, nome: 'Delivery' })
   }
 
   async filiaisView({ view }) {

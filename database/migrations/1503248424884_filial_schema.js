@@ -3,7 +3,8 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
 
-// create database maisvendas character set UTF8 collate utf8_bin;
+// SCRIPT
+// CREATE DATABASE maisvendas CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 class FilialSchema extends Schema {
   up () {

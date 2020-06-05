@@ -1,0 +1,114 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Cadastrar Pedido
+@endsection
+
+@section('content')
+
+<h1>Cadastrar Pedido</h1>
+
+<div class="teste-container">
+    <form action="{{ route('store.pedido') }}" method="POST">
+        {{ csrfField() }}
+
+        <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+
+        <label for="tipo_id">Tipo</label>
+        <select id="selectTipo" class="form-control" name="tipo_id">
+            @each(tipo in tipos)
+                <option value="{{ tipo.id }}" {{ old('tipo_id') == tipo.id ? 'selected' : '' }}>{{ tipo.nome }}</option>
+            @endeach
+        </select>
+
+        @if(hasErrorFor('tipo_id'))
+            <span>
+                {{ getErrorFor('tipo_id') }}
+            </span>
+        @endif
+
+        <div hidden id="divMesa">
+            <label id="labelMesa" for="mesa_id">Mesa</label>
+            <select id="selectMesa" class="form-control" name="mesa_id">
+                @each(mesa in mesas)
+                    <option value="{{ mesa.id }}" {{ old('mesa_id') == mesa.id ? 'selected' : '' }}>Mesa nº {{ mesa.numero }}</option>
+                @endeach
+            </select>
+            @if(hasErrorFor('mesa_id'))
+                <span>
+                    {{ getErrorFor('mesa_id') }}
+                </span>
+            @endif
+            <span {{ mesas == null || mesas.length == 0 ? '' : 'hidden' }} id="spanMesa">Não existem mesas vazias</span>
+        </div>
+
+        <label hidden id="labelEnderecoEntrega" for="enderecoEntrega">Endereço de Entrega</label>
+        <input hidden id="inputEnderecoEntrega" class="form-control" type="text" name="enderecoEntrega" value="{{ old('enderecoEntrega', '') }}" maxlength="200">
+        @if(hasErrorFor('enderecoEntrega'))
+            <span id="spanEnderecoEntrega">
+                {{ getErrorFor('enderecoEntrega') }}
+            </span>
+        @endif
+
+        <label for="observacao">Observação</label>
+        <input class="form-control" type="text" name="observacao" value="{{ old('observacao', '') }}" maxlength="200">
+        @if(hasErrorFor('observacao'))
+            <span>
+                {{ getErrorFor('observacao') }}
+            </span>
+        @endif
+
+        <label for="total">Total</label>
+        <input class="form-control" type="number" name="total" value="{{ old('total', '') }}" min="00.01" max="999.00" step="00.01">
+        @if(hasErrorFor('total'))
+            <span>
+                {{ getErrorFor('total') }}
+            </span>
+        @endif
+
+        @if(flashMessage('storePedidoError'))
+            <p></p>
+            <span>{{ flashMessage('storePedidoError') }}</span>
+        @endif
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var select = document.getElementById('selectTipo');
+        configurarVisibilidade(select.options[select.selectedIndex].value);
+    })
+
+    $('#selectTipo').change(function(event) {
+        configurarVisibilidade(event.currentTarget.value);
+    })
+
+    function configurarVisibilidade(tipo) {
+        consumirNoLocal = tipo == 1;
+        delivery = tipo == 3;
+
+        // $("#labelMesa").prop("hidden", !consumirNoLocal);
+        // $("#selectMesa").prop("hidden", !consumirNoLocal);
+        $("#divMesa").prop("hidden", !consumirNoLocal);
+
+        $("#labelEnderecoEntrega").prop("hidden", !delivery);
+        $("#inputEnderecoEntrega").prop("hidden", !delivery);
+        $("#spanEnderecoEntrega").prop("hidden", !delivery);
+
+        if(consumirNoLocal) {
+            document.getElementById('selectMesa').focus();
+        }
+        if(delivery) {
+            document.getElementById('inputEnderecoEntrega').focus();
+        }
+    }
+</script>
+
+@endsection
