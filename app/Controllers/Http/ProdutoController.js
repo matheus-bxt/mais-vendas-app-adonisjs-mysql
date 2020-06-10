@@ -130,7 +130,17 @@ class ProdutoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request, response, session }) {
+    var produto = await Produto.findBy('id', params.produto_id);
+    if (produto == null) {
+      //retorna mensagem de erro para informar não foi encontrado o produto com o id informado
+      session.flash({deleteProdutoError: 'Não foi encontrado o produto com o id informado!'});
+      return response.redirect('back');
+    }
+
+    await produto.delete();
+
+    return response.redirect('/cardapio');
   }
 }
 

@@ -66,6 +66,14 @@ Route.group('userauth', () => {
         Route.put('/alterarMesa/:mesa_id', 'MesaController.update').as('update.mesa').prefix('api').validator('CreateMesa').middleware(['admin']);
         Route.put('/alterarPedido/:pedido_id', 'PedidoController.update').as('update.pedido').prefix('api').validator('CreatePedido');
 
+    //DELETE
+        Route.delete('/excluirFilial/:filial_id', 'FilialController.destroy').as('destroy.filial').prefix('api').middleware(['admin']);
+        Route.delete('/excluirUsuario/:usuario_id', 'UserController.destroy').as('destroy.usuario').prefix('api').middleware(['admin']);
+        Route.delete('/excluirDespesa/:despesa_id', 'DespesaController.destroy').as('destroy.despesa').prefix('api').middleware(['admin']);
+        Route.delete('/excluirProduto/:produto_id', 'ProdutoController.destroy').as('destroy.produto').prefix('api').middleware(['admin']);
+        Route.delete('/excluirMesa/:mesa_id', 'MesaController.destroy').as('destroy.mesa').prefix('api').middleware(['admin']);
+        Route.delete('/excluirPedido/:pedido_id', 'PedidoController.destroy').as('destroy.pedido').prefix('api').middleware(['admin']);
+
     //LOGOUT
         Route.get('/logout', async ({ auth, response }) => {
             await auth.logout();

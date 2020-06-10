@@ -37,12 +37,16 @@ MaisVendas - Produtos
                     <td>{{ produto.custo }}</td>
                     <td>{{ produto.precoVenda }}</td>
                     <td class="text-center">
-                        <a type="button" href="{{ route('view.alterarProduto', { produto_id: produto.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar produto">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir produto">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                        <form action="{{ route('destroy.produto', { produto_id: produto.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+
+                            <a type="button" href="{{ route('view.alterarProduto', { produto_id: produto.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar produto">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
@@ -53,6 +57,11 @@ MaisVendas - Produtos
 @if(flashMessage('openToEditProdutoError'))
     <p></p>
     <span>{{ flashMessage('openToEditProdutoError') }}</span>
+@endif
+
+@if(flashMessage('deleteProdutoError'))
+    <p></p>
+    <span>{{ flashMessage('deleteProdutoError') }}</span>
 @endif
 
 @endsection

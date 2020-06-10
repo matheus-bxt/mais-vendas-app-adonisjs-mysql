@@ -35,17 +35,31 @@ MaisVendas - Filiais
                     <td>{{ filial.telefone }}</td>
                     <td>{{ filial.endereco }}</td>
                     <td class="text-center">
-                        <a type="button" href="{{ route('view.alterarFilial', { filial_id: filial.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar filial">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir filial">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                        <form action="{{ route('destroy.filial', { filial_id: filial.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+
+                            <a type="button" href="{{ route('view.alterarFilial', { filial_id: filial.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar filial">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir filial">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
         </tbody>
     @endif
 </table>
+
+@if(flashMessage('openToEditFilialError'))
+    <p></p>
+    <span>{{ flashMessage('openToEditFilialError') }}</span>
+@endif
+
+@if(flashMessage('deleteFilialError'))
+    <p></p>
+    <span>{{ flashMessage('deleteFilialError') }}</span>
+@endif
 
 @endsection

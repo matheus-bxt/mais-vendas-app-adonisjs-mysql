@@ -1,6 +1,7 @@
 'use strict'
 
 const Mesa = use('App/Models/Mesa');
+const Pedido = use('App/Models/Pedido');
 const Database = use('Database');
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -138,7 +139,30 @@ class MesaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request, response, session }) {
+    var mesa = await Mesa.findBy('id', params.mesa_id);
+    if (mesa == null) {
+      //retorna mensagem de erro para informar não foi encontrada a mesa com o id informado
+      session.flash({deleteMesaError: 'Não foi encontrada a mesa com o id informado!'})
+      return response.redirect('back');
+    }
+
+    const statusPago = 6;
+    const pedidos = await Pedido
+    .query()
+    .where('filial_id', mesa.filial_id)
+    .andWhere('mesa_id', mesa.id)
+    .andWhere('status_id', '<>', statusPago)
+    .fetch();
+
+    if (pedidos.rows[0] != null) {
+      session.flash({deleteMesaError: `Não é possível excluir a mesa: ${mesa.numero} pois ela está ocupada! Para liberá-la, o pedido: ${pedidos.rows[0].id} deve ser pago ou excluído!`});
+      return response.redirect('back');
+    }
+    
+    await mesa.delete();
+
+    return response.redirect('/mesas');
   }
 }
 

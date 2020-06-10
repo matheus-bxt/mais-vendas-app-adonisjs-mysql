@@ -30,7 +30,7 @@ MaisVendas - Cadastrar Pedido
         @endif
 
         <label for="total">Total</label>
-        <input class="form-control" type="number" name="total" value="{{ old('total', '') }}" min="1,00" max="999,00" step="0,01">
+        <input class="form-control" type="number" name="total" value="{{ old('total', '') }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('total'))
             <span>
                 {{ getErrorFor('total') }}

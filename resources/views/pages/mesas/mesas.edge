@@ -39,13 +39,17 @@ MaisVendas - Mesas
                         @endif
                     </td>
                     <td>{{ mesa.nome }}</td>
-                    <td class="text-center">                        
-                        <a type="button" href="{{ route('view.alterarMesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar mesa">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir mesa">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                    <td class="text-center">
+                        <form action="{{ route('destroy.mesa', { mesa_id: mesa.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+                            
+                            <a type="button" href="{{ route('view.alterarMesa', { mesa_id: mesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar mesa">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir mesa">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
@@ -66,6 +70,11 @@ MaisVendas - Mesas
 @if(flashMessage('cadastrarPedidoMesaError'))
     <p></p>
     <span>{{ flashMessage('cadastrarPedidoMesaError') }}</span>
+@endif
+
+@if(flashMessage('deleteMesaError'))
+    <p></p>
+    <span>{{ flashMessage('deleteMesaError') }}</span>
 @endif
 
 @endsection

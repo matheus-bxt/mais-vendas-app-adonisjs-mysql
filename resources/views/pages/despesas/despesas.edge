@@ -34,12 +34,16 @@ MaisVendas - Despesas
                     <td>{{ despesa.data }}</td>
                     <td>{{ despesa.valor }}</td>
                     <td class="text-center">
-                        <a type="button" href="{{ route('view.alterarDespesa', { despesa_id: despesa.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar despesa">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir despesa">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                        <form action="{{ route('destroy.despesa', { despesa_id: despesa.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+
+                            <a type="button" href="{{ route('view.alterarDespesa', { despesa_id: despesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar despesa">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir despesa">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
@@ -50,6 +54,11 @@ MaisVendas - Despesas
 @if(flashMessage('openToEditDespesaError'))
     <p></p>
     <span>{{ flashMessage('openToEditDespesaError') }}</span>
+@endif
+
+@if(flashMessage('deleteDespesaError'))
+    <p></p>
+    <span>{{ flashMessage('deleteDespesaError') }}</span>
 @endif
 
 @endsection

@@ -41,12 +41,16 @@ MaisVendas - Pedidos
                     <td>{{ pedido.observacao != null ? pedido.observacao : '' }}</td>
                     <td class="text-right">{{ pedido.total }}</td>
                     <td class="text-center">
-                        <a type="button" href="{{ route('view.alterarPedido', { pedido_id: pedido.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar pedido">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir pedido">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                        <form action="{{ route('destroy.pedido', { pedido_id: pedido.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+                            
+                            <a type="button" href="{{ route('view.alterarPedido', { pedido_id: pedido.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar pedido">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir pedido">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
@@ -57,6 +61,11 @@ MaisVendas - Pedidos
 @if(flashMessage('openToEditPedidoError'))
     <p></p>
     <span>{{ flashMessage('openToEditPedidoError') }}</span>
+@endif
+
+@if(flashMessage('deletePedidoError'))
+    <p></p>
+    <span>{{ flashMessage('deletePedidoError') }}</span>
 @endif
 
 @endsection

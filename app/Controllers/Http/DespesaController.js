@@ -129,7 +129,17 @@ class DespesaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request, response, session }) {
+    var despesa = await Despesa.findBy('id', params.despesa_id);
+    if (despesa == null) {
+      //retorna mensagem de erro para informar não foi encontrada a despesa com o id informado
+      session.flash({deleteDespesaError: 'Não foi encontrada a despesa com o id informado!'});
+      return response.redirect('back');
+    }
+
+    await despesa.delete();
+
+    return response.redirect('/despesas');
   }
 }
 

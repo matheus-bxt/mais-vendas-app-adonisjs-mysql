@@ -48,19 +48,19 @@ class PedidoController {
    */
   async store ({ request, response, params, session }) {
     // Extrai os dados do request
-    const data = request.only(['filial_id', 'tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'total']);
+    const dados = request.only(['filial_id', 'tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'total']);
 
     const consumirNoLocal = 1;
-    data.mesa_id = data.tipo_id == consumirNoLocal ? data.mesa_id : null;
+    dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
 
     const delivery = 3;
-    data.enderecoEntrega = data.tipo_id == delivery ? data.enderecoEntrega : null; 
+    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null; 
 
     const statusPedidoNovo = await StatusPedido.findBy('id', 1);//1 - Novo
-    data.status_id = statusPedidoNovo.id;
+    dados.status_id = statusPedidoNovo.id;
 
-    if (data.mesa_id > 0) {
-      var mesa = await Mesa.findBy('id', data.mesa_id);
+    if (dados.mesa_id > 0) {
+      var mesa = await Mesa.findBy('id', dados.mesa_id);
       if (mesa == null) {
         session.flash({storePedidoError: 'A mesa selecionada não existe mais.'});
         return response.redirect('back');
@@ -75,8 +75,12 @@ class PedidoController {
       await mesa.save();
     }
 
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dados.data = today;
+
     // Cria novo pedido com os dados do request
-    await Pedido.create(data);
+    await Pedido.create(dados);
 
     if (params.mesaSelecionada > 0) {
       return response.redirect('/mesas');
@@ -178,6 +182,23 @@ class PedidoController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
+    var pedido = await Pedido.findBy('id', params.pedido_id);
+    if (pedido == null) {
+      //retorna mensagem de erro para informar não foi encontrado o pedido com o id informado
+      session.flash({deletePedidoError: 'Não foi encontrado o pedido com o id informado!'})
+      return response.redirect('back');
+    }
+    
+    var mesa = await Mesa.findBy('id', pedido.mesa_id);
+    if (mesa != null) {
+      const statusVazia = 1;
+      mesa.status_id = statusVazia;
+      await mesa.save();
+    }
+
+    await pedido.delete();
+
+    return response.redirect('/pedidos');
   }
 }
 

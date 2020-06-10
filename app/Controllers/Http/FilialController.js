@@ -113,17 +113,15 @@ class FilialController {
     return view.render('pages.filiais.cadastrarFilial', { filiais: filiais.toJSON() });
   }
 
-  async alterarFilialView({ view, params }) {
-    if(params.filial_id != null && params.filial_id > 0) {
-      var filial = await Filial.findBy('id', params.filial_id);
-      if (filial == null) {
-        //retorna mensagem de erro para informar não foi encontrada a filial com o id informado
-      }
-
-      return view.render('pages.filiais.alterarFilial', { filial: filial.toJSON() });
-    } else {
-      //retorna mensagem de erro
+  async alterarFilialView({ view, params, session, response }) {
+    var filial = await Filial.findBy('id', params.filial_id);
+    if (filial == null) {
+      //retorna mensagem de erro para informar não foi encontrada a filial com o id informado
+      session.flash({openToEditFilialError: 'Não foi encontrada a filial com o id informado!'});
+      return response.redirect('back');
     }
+
+    return view.render('pages.filiais.alterarFilial', { filial: filial.toJSON() });
   }
 
   /**
@@ -200,7 +198,27 @@ class FilialController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request, response, session, auth }) {
+    var filial = await Filial.findBy('id', params.filial_id);
+    if (filial == null) {
+      //retorna mensagem de erro para informar não foi encontrada a filial com o id informado
+      session.flash({deleteFilialError: 'Não foi encontrada a filial com o id informado!'});
+      return response.redirect('back');
+    }
+
+    if (filial.id == auth.user.filial_id) {
+      session.flash({deleteFilialError: `Não é possível excluir a filial: ${filial.id} - ${filial.nome}, pois você está logado nela!`});
+      return response.redirect('back');
+    }
+
+    try {
+      await filial.delete();
+    } catch (error) {
+      session.flash({deleteFilialError: 'Não é possível excluir a filial, pois a mesma já possui vínculos!'});
+      return response.redirect('back');
+    }
+
+    return response.redirect('/filiais');
   }
 }
 

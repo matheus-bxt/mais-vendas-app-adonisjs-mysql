@@ -35,17 +35,31 @@ MaisVendas - Usuários
                     <td class="text-center">{{ usuario.admin == 1 ? 'Sim' : 'Não' }}</td>                    
                     <td>{{ usuario.filial.nome }}</td>
                     <td class="text-center">
-                        <a type="button" href="{{ route('view.alterarUsuario', { usuario_id: usuario.id }) }}" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar usuário">
-                            <i class="fas fa-edit fa-sm"></i>
-                        </a>
-                        <a type="button" href="" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Excluir usuário">
-                            <i class="far fa-trash-alt fa-sm"></i>
-                        </a>
+                        <form action="{{ route('destroy.usuario', { usuario_id: usuario.id }) }}?_method=DELETE" method="POST">
+                            {{ csrfField() }}
+
+                            <a type="button" href="{{ route('view.alterarUsuario', { usuario_id: usuario.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar usuário">
+                                <i class="fas fa-edit fa-sm"></i>
+                            </a>
+                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir usuário">
+                                <i class="far fa-trash-alt fa-sm"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>                    
             @endeach
         </tbody>
     @endif
 </table>
+
+@if(flashMessage('openToEditUsuarioError'))
+    <p></p>
+    <span>{{ flashMessage('openToEditUsuarioError') }}</span>
+@endif
+
+@if(flashMessage('deleteUsuarioError'))
+    <p></p>
+    <span>{{ flashMessage('deleteUsuarioError') }}</span>
+@endif
 
 @endsection

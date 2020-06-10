@@ -45,7 +45,7 @@ a.primeiroLogin {
     -webkit-box-shadow: 0 0 0 30px white inset;
 } */
 
-button {
+button:not(.classe-excluir) {
     padding: .5em !important;
     background: rgba(9, 50, 94, 100);
     border: 0;

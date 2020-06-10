@@ -138,19 +138,17 @@ class UserController {
     return view.render('pages.usuarios.cadastrarUsuario', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
   }
 
-  async alterarUsuarioView({ view, params }) {
-    if(params.usuario_id != null && params.usuario_id > 0) {
-      var usuario = await User.findBy('id', params.usuario_id);
-      if (usuario == null) {
-        //retorna mensagem de erro para informar não foi encontrada a filial com o id informado
-      }
-
-      const filiais = await Filial.all();
-
-      return view.render('pages.usuarios.alterarUsuario', { usuario: usuario.toJSON(), filiais: filiais.toJSON() });
-    } else {
-      //retorna mensagem de erro
+  async alterarUsuarioView({ view, params, session, response }) {
+    var usuario = await User.findBy('id', params.usuario_id);
+    if (usuario == null) {
+      //retorna mensagem de erro para informar não foi encontrado o usuário com o id informado
+      session.flash({openToEditUsuarioError: 'Não foi encontrado o usuário com o id informado!'});
+      return response.redirect('back');
     }
+
+    const filiais = await Filial.all();
+
+    return view.render('pages.usuarios.alterarUsuario', { usuario: usuario.toJSON(), filiais: filiais.toJSON() });
   }
 
   /**
@@ -234,22 +232,22 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
-    // Busca o usuario cadastrado com o parametro id
-    const user = await User.find(params.id);
-
-    // Verifica se o usuario existe
-    if(user == null) {
-      // Retorna mensagem no response para informar que o usuario informado não existe
-      response.status(404).send({error:{ message: 'Usuário informado não existe!' }});
-      return response;
+  async destroy ({ params, request, response, session, auth }) {
+    var usuario = await User.findBy('id', params.usuario_id);
+    if (usuario == null) {
+      //retorna mensagem de erro para informar não foi encontrado o usuário com o id informado
+      session.flash({deleteUsuarioError: 'Não foi encontrado o usuário com o id informado!'});
+      return response.redirect('back');
     }
 
-    // Exclui o usuário
-    await user.delete();
+    if (usuario.id == auth.user.id) {
+      session.flash({deleteUsuarioError: `Não é possível excluir o usuário: ${usuario.id} - ${usuario.nome}, pois você está logado nele!`});
+      return response.redirect('back');
+    }
 
-    // Retorna mensagem
-    return "Excluído com sucesso!";
+    await usuario.delete();
+
+    return response.redirect('/usuarios');
   }
 }
 
