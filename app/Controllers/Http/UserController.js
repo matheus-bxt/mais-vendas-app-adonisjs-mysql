@@ -203,9 +203,14 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
     // Busca usuário cadastrado com o parametro usuario_id
     const usuario = await User.find(params.usuario_id);
+    if (usuario == null) {
+      //retorna mensagem de erro para informar que o usuário não existe mais
+      session.flash({updateUsuarioError: 'O usuário não existe mais!'})
+      return response.redirect('/usuarios');
+    }
 
     var { alterarSenha } = request.all();
     if(alterarSenha == 'on') {

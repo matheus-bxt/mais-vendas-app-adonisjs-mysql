@@ -35,7 +35,7 @@ MaisVendas - Alterar Despesa
             </span>
         @endif
 
-        <label for="valor">Valor</label>
+        <label for="valor">Valor (R$)</label>
         <input class="form-control" type="number" name="valor" value="{{ old('valor', despesa.valor) }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('valor'))
             <span>

@@ -26,7 +26,7 @@
         {{ csrfField() }}
 
         <div class="input-group">
-            <select name="filial" id="inputFilial" class="form-control">
+            <select name="filial" id="inputFilial" class="form-control" required>
                 <option value="" disabled selected hidden>Selecione uma filial</option>
             @each(filial in filiais)
                 <option value="{{ filial.id }}" {{ old('filial') == filial.id ? 'selected' : '' }}>{{ filial.nome }}</option>

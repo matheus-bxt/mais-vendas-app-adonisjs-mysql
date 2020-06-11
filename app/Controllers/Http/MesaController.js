@@ -117,9 +117,14 @@ class MesaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
     // Busca a mesa cadastrada com o parametro mesa_id
     const mesa = await Mesa.find(params.mesa_id);
+    if (mesa == null) {
+      //retorna mensagem de erro para informar que a mesa não existe mais
+      session.flash({updateMesaError: 'A mesa não existe mais!'})
+      return response.redirect('/mesas');
+    }
 
     // Extrai os dados do request
     const data = request.only(['numero', 'nome']);

@@ -108,9 +108,14 @@ class ProdutoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
     // Busca o produto cadastrado com o parametro produto_id
     const produto = await Produto.find(params.produto_id);
+    if (produto == null) {
+      //retorna mensagem de erro para informar que o produto não existe mais
+      session.flash({updateProdutoError: 'O produto não existe mais!'})
+      return response.redirect('/cardapio');
+    }
 
     // Extrai os dados do request
     const data = request.only(['codigo', 'nome', 'descricao', 'custo', 'precoVenda']);

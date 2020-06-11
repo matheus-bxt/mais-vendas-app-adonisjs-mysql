@@ -43,7 +43,7 @@ MaisVendas - Alterar Produto
             </span>
         @endif
 
-        <label for="custo">Custo</label>
+        <label for="custo">Custo (R$)</label>
         <input class="form-control" type="number" name="custo" value="{{ old('custo', produto.custo) }}" min="0.00" max="9999.99" step="0.01">
         @if(hasErrorFor('custo'))
             <span>
@@ -51,7 +51,7 @@ MaisVendas - Alterar Produto
             </span>
         @endif
 
-        <label for="precoVenda">Preço de Venda</label>
+        <label for="precoVenda">Preço Venda (R$)</label>
         <input class="form-control" type="number" name="precoVenda" value="{{ old('precoVenda', produto.precoVenda) }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('precoVenda'))
             <span>

@@ -107,9 +107,14 @@ class DespesaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
     // Busca a despesa cadastrada com o parametro despesa_id
     const despesa = await Despesa.find(params.despesa_id);
+    if (despesa == null) {
+      //retorna mensagem de erro para informar que a despesa não existe mais
+      session.flash({updateDespesaError: 'A despesa não existe mais!'})
+      return response.redirect('/despesas');
+    }
 
     // Extrai os dados do request
     const data = request.only(['descricao', 'data', 'valor']);

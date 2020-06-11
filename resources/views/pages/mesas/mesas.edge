@@ -67,14 +67,14 @@ MaisVendas - Mesas
     <span>{{ flashMessage('adminOnlyError') }}</span>
 @endif
 
-@if(flashMessage('cadastrarPedidoMesaError'))
-    <p></p>
-    <span>{{ flashMessage('cadastrarPedidoMesaError') }}</span>
-@endif
-
 @if(flashMessage('deleteMesaError'))
     <p></p>
     <span>{{ flashMessage('deleteMesaError') }}</span>
+@endif
+
+@if(flashMessage('updateMesaError'))
+    <p></p>
+    <span>{{ flashMessage('updateMesaError') }}</span>
 @endif
 
 @endsection

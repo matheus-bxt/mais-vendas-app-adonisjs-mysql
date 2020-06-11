@@ -176,9 +176,14 @@ class FilialController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
     // Busca a filial cadastrada com o parametro filial_id
     const filial = await Filial.find(params.filial_id);
+    if (filial == null) {
+      //retorna mensagem de erro para informar que a filial não existe mais
+      session.flash({updateFilialError: 'A filial não existe mais!'})
+      return response.redirect('/filiais');
+    }
 
     // Extrai os dados do request
     const data = request.only(['nome', 'cnpj', 'telefone', 'endereco']);

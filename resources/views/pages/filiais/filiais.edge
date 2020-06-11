@@ -62,4 +62,9 @@ MaisVendas - Filiais
     <span>{{ flashMessage('deleteFilialError') }}</span>
 @endif
 
+@if(flashMessage('updateFilialError'))
+    <p></p>
+    <span>{{ flashMessage('updateFilialError') }}</span>
+@endif
+
 @endsection

@@ -62,4 +62,9 @@ MaisVendas - Usuários
     <span>{{ flashMessage('deleteUsuarioError') }}</span>
 @endif
 
+@if(flashMessage('updateUsuarioError'))
+    <p></p>
+    <span>{{ flashMessage('updateUsuarioError') }}</span>
+@endif
+
 @endsection
