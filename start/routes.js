@@ -48,7 +48,8 @@ Route.group('userauth', () => {
         //PEDIDOS
         Route.get('/pedidos', 'PedidoController.pedidosView').as('view.pedidos');
         Route.get('/cadastrarPedido/:mesaSelecionadaId?', 'PedidoController.cadastrarPedidoView').as('view.cadastrarPedido');
-        Route.get('/alterarPedido/:pedido_id', 'PedidoController.alterarPedidoView').as('view.alterarPedido');
+        Route.get('/alterarPedido/:pedido_id?', 'PedidoController.alterarPedidoView').as('view.alterarPedido');
+        Route.get('/adicionarProdutos/pedido/:pedido_id?', 'PedidoController.alterarPedidoView').as('view.adicionarProdutos-pedido');
 
     //CREATE
         Route.post('/cadastrarFilial', 'FilialController.store').as('store.filial').prefix('api').validator('CreateFilial').middleware(['admin']);
@@ -56,7 +57,8 @@ Route.group('userauth', () => {
         Route.post('/cadastrarDespesa', 'DespesaController.store').as('store.despesa').prefix('api').validator('CreateDespesa').middleware(['admin']);
         Route.post('/cadastrarProduto', 'ProdutoController.store').as('store.produto').prefix('api').validator('CreateProduto').middleware(['admin']);
         Route.post('/cadastrarMesa', 'MesaController.store').as('store.mesa').prefix('api').validator('CreateMesa');
-        Route.post('/cadastrarPedido/:mesaSelecionadaId?', 'PedidoController.store').as('store.pedido').prefix('api').validator('CreatePedido');
+        Route.post('/cadastrarPedido', 'PedidoController.store').as('store.pedido').prefix('api').validator('CreatePedido');
+        Route.post('/adicionarProdutoPedido', 'PedidoController.storeProdutoPedido').as('store.produto-pedido').prefix('api')
 
     //UPDATE
         Route.put('/alterarFilial/:filial_id', 'FilialController.update').as('update.filial').prefix('api').validator('CreateFilial').middleware(['admin']);
@@ -65,6 +67,7 @@ Route.group('userauth', () => {
         Route.put('/alterarProduto/:produto_id', 'ProdutoController.update').as('update.produto').prefix('api').validator('CreateProduto').middleware(['admin']);
         Route.put('/alterarMesa/:mesa_id', 'MesaController.update').as('update.mesa').prefix('api').validator('CreateMesa').middleware(['admin']);
         Route.put('/alterarPedido/:pedido_id', 'PedidoController.update').as('update.pedido').prefix('api').validator('CreatePedido');
+        Route.put('/alterarProdutoPedido/:id', 'PedidoController.updateProdutoPedido').as('update.produto-pedido').prefix('api')
 
     //DELETE
         Route.delete('/excluirFilial/:filial_id', 'FilialController.destroy').as('destroy.filial').prefix('api').middleware(['admin']);
@@ -73,6 +76,7 @@ Route.group('userauth', () => {
         Route.delete('/excluirProduto/:produto_id', 'ProdutoController.destroy').as('destroy.produto').prefix('api').middleware(['admin']);
         Route.delete('/excluirMesa/:mesa_id', 'MesaController.destroy').as('destroy.mesa').prefix('api').middleware(['admin']);
         Route.delete('/excluirPedido/:pedido_id', 'PedidoController.destroy').as('destroy.pedido').prefix('api').middleware(['admin']);
+        Route.delete('/excluirProdutoPedido/:id', 'PedidoController.destroyProdutoPedido').as('destroy.produto-pedido').prefix('api')
 
     //LOGOUT
         Route.get('/logout', async ({ auth, response }) => {

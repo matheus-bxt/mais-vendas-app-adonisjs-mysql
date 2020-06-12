@@ -4,7 +4,8 @@ const Pedido = use('App/Models/Pedido');
 const TipoPedido = use('App/Models/TipoPedido');
 const Mesa = use('App/Models/Mesa');
 const StatusPedido = use('App/Models/StatusPedido');
-const Database = use('Database');
+const Produto = use('App/Models/Produto');
+const PedidoProduto = use('App/Models/PedidoProduto');
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -46,7 +47,7 @@ class PedidoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response, params, session }) {
+  async store ({ request, response, params, session, view }) {
     // Extrai os dados do request
     const dados = request.only(['filial_id', 'tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'total']);
 
@@ -54,25 +55,14 @@ class PedidoController {
     dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
 
     const delivery = 3;
-    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null; 
+    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null;
 
     const statusPedidoNovo = await StatusPedido.findBy('id', 1);//1 - Novo
     dados.status_id = statusPedidoNovo.id;
 
-    if (dados.mesa_id > 0) {
-      var mesa = await Mesa.findBy('id', dados.mesa_id);
-      if (mesa == null) {
-        session.flash({storePedidoError: 'A mesa selecionada não existe mais.'});
-        return response.redirect('back');
-      }
-      const statusOcupada = 2;
-      if (mesa.status_id == statusOcupada) {
-        session.flash({storePedidoError: 'A mesa selecionada já está ocupada.'});
-        return response.redirect('back');
-      }
-
-      mesa.status_id = statusOcupada;
-      await mesa.save();
+    var retorno = await this.atualizaStatusMesa(0, dados.mesa_id, session, response);
+    if (retorno == false) {
+      return response.redirect('back');
     }
 
     var today = new Date();
@@ -80,13 +70,9 @@ class PedidoController {
     dados.data = today;
 
     // Cria novo pedido com os dados do request
-    await Pedido.create(dados);
+    const novoPedido = await Pedido.create(dados);
 
-    if (params.mesaSelecionada > 0) {
-      return response.redirect('/mesas');
-    } else {
-      return response.redirect('/pedidos');
-    }
+    return response.redirect(`/adicionarProdutos/pedido/${novoPedido.id}`, true);
   }
 
   async pedidosView({ view, auth }) {
@@ -102,29 +88,14 @@ class PedidoController {
   }
 
   async cadastrarPedidoView({ view, auth, params, session, response }) {
-    if (params.mesaSelecionadaId > 0) {
-      const mesa = await Mesa.findBy('id', params.mesaSelecionadaId);
-      if (mesa == null) {
-        session.flash({cadastrarPedidoMesaError: 'A mesa selecionada não existe mais.'});
-        return response.redirect('back');
-      }
-      const statusOcupada = 2;
-      if (mesa.status_id == statusOcupada) {
-        session.flash({cadastrarPedidoMesaError: 'A mesa selecionada já está ocupada.'});
-        return response.redirect('back');
-      }
+    const tipos = await TipoPedido.all();
+    const mesas = await Mesa
+    .query()
+    .where('filial_id', auth.user.filial_id)
+    .andWhere('status_id', 1)
+    .fetch();
 
-      return view.render('pages.pedidos.cadastrarPedidoMesa', { mesaSelecionadaId: mesa.id, mesaSelecionadaNumero: mesa.numero });
-    } else {
-      const tipos = await TipoPedido.all();
-      const mesas = await Mesa
-      .query()
-      .where('filial_id', auth.user.filial_id)
-      .andWhere('status_id', 1)
-      .fetch();
-
-      return view.render('pages.pedidos.cadastrarPedido', { tipos: tipos.toJSON(), mesas: mesas.toJSON() });
-    }
+    return view.render('pages.pedidos.cadastrarPedido', { tipos: tipos.toJSON(), mesas: mesas.toJSON(), mesaSelecionadaId: params.mesaSelecionadaId });
   }
 
   async alterarPedidoView({ view, params, session, response, auth }) {
@@ -135,7 +106,45 @@ class PedidoController {
       return response.redirect('back');
     }
 
-    return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON() });
+    const tipos = await TipoPedido.all();
+    const mesas = await Mesa
+    .query()
+    .where('filial_id', auth.user.filial_id)
+    .andWhere('status_id', 1)
+    .orWhere('id', pedido.mesa_id)
+    .fetch();
+
+    const pedidoProdutos = await PedidoProduto
+    .query()
+    .where('pedido_id', params.pedido_id)
+    .with('pedido')
+    .with('produto')
+    .fetch();
+
+    const produtos = await Produto
+    .query()
+    .where('filial_id', auth.user.filial_id)
+    .fetch();
+
+    return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON(), tipos: tipos.toJSON(), mesas: mesas.toJSON(), pedidoProdutos: pedidoProdutos.toJSON(), produtos: produtos.toJSON() });
+  }
+
+  async storeProdutoPedido({ request, view, params, session, response, auth }) {
+    const dados = request.only(['quantidade', 'precoUnitario', 'observacao', 'pedido_id', 'produto_id']);
+
+    var pedido = await Pedido.findBy('id', dados.pedido_id);
+    if (pedido == null) {
+      //retorna mensagem de erro para informar que o pedido não existe mais
+      session.flash({updatePedidoError: 'O pedido não existe mais!'})
+      return response.redirect('/pedidos');
+    }
+
+    await PedidoProduto.create(dados);
+
+    pedido.total = await this.calcularTotalPedido(pedido);
+    await pedido.save();
+
+    return response.redirect(`/adicionarProdutos/pedido/${dados.pedido_id}`, true);
   }
 
   /**
@@ -170,7 +179,85 @@ class PedidoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, session }) {
+    // Busca o pedido cadastrado com o parametro pedido_id
+    const pedido = await Pedido.find(params.pedido_id);
+    if (pedido == null) {
+      //retorna mensagem de erro para informar que o pedido não existe mais
+      session.flash({updatePedidoError: 'O pedido não existe mais!'})
+      return response.redirect('/pedidos');
+    }
+
+    // Extrai os dados do request
+    const dados = request.only(['tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao']);
+
+    const consumirNoLocal = 1;
+    dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
+
+    const delivery = 3;
+    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null;
+
+    dados.total = await this.calcularTotalPedido(pedido);
+
+    const mesaAnteriorId = pedido.mesa_id != null ? pedido.mesa_id : 0;
+    var retorno = await this.atualizaStatusMesa(mesaAnteriorId, dados.mesa_id, session);
+    if (retorno == false) {
+      return response.redirect('back');
+    }
+
+    // Atualiza e salva o pedido
+    pedido.merge(dados);
+    await pedido.save();
+    
+    return response.redirect('/pedidos');
+  }
+
+  async updateProdutoPedido({ params, request, response, session }) {
+    var pedidoProduto = await PedidoProduto.findBy('id', params.id);
+    if (pedidoProduto == null) {
+      session.flash({updateProdutoPedidoError: 'O produto não existe mais.'});
+      return response.redirect('back');
+    }
+
+    // Extrai os dados do request
+    const dados = request.only(['produto_id', 'quantidade', 'precoUnitario', 'observacao']);
+    
+    pedidoProduto.merge(dados);
+    await pedidoProduto.save();
+    
+    return response.redirect('back');
+  }
+
+  async atualizaStatusMesa(mesaAnteriorId, mesaAtualId, session) {
+    if (mesaAnteriorId != mesaAtualId) {
+
+      if (mesaAtualId > 0) {
+        var mesaAtual = await Mesa.findBy('id', mesaAtualId);
+        if (mesaAtual == null) {
+          session.flash({updateStatusMesaError: 'A mesa selecionada não existe mais.'});
+          return false;
+        }
+
+        const statusOcupada = 2;
+
+        // if (mesa.status_id == statusOcupada) {
+        //   session.flash({storePedidoError: 'A mesa selecionada já está ocupada.'});
+        //   return response.redirect('back');
+        // }
+
+        mesaAtual.status_id = statusOcupada;
+        await mesaAtual.save();
+      }
+
+      var mesaAnterior = await Mesa.findBy('id', mesaAnteriorId);
+      if (mesaAnterior != null) {
+        const statusVazia = 1;
+        mesaAnterior.status_id = statusVazia;
+        await mesaAnterior.save();
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -196,9 +283,33 @@ class PedidoController {
       await mesa.save();
     }
 
+    await pedido.pedidoProdutos().delete();
     await pedido.delete();
 
     return response.redirect('/pedidos');
+  }
+
+  async destroyProdutoPedido ({ params, request, response, session }) {
+    var pedidoProduto = await PedidoProduto.findBy('id', params.id);
+    if (pedidoProduto == null) {
+      session.flash({deleteProdutoPedidoError: 'O produto não existe mais.'});
+      return response.redirect('back');
+    }
+
+    await pedidoProduto.delete();
+
+    var pedido = await Pedido.findBy('id', pedidoProduto.pedido_id);
+    pedido.total = await this.calcularTotalPedido(pedido);
+    await pedido.save();
+
+    return response.redirect('back');
+  }
+
+  async calcularTotalPedido(pedido) {
+    var pedidoProdutos = await pedido.pedidoProdutos().fetch();
+    var total = pedidoProdutos.toJSON().reduce((a, { quantidade, precoUnitario }) => a + (quantidade * precoUnitario), 0);
+
+    return total;
   }
 }
 

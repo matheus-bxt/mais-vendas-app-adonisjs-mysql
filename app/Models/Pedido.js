@@ -22,6 +22,9 @@ class Pedido extends Model {
     mesa() {
         return this.belongsTo('App/Models/Mesa', 'mesa_id', 'id')
     }
+    pedidoProdutos() {
+        return this.hasMany('App/Models/PedidoProduto')
+    }
 }
 
 module.exports = Pedido

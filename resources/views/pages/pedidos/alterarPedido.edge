@@ -1,0 +1,259 @@
+@layout('layouts.main')
+
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/forms.css') }}
+@endsection
+
+@section('title')
+MaisVendas - Pedido: {{ pedido.id }}
+@endsection
+
+@section('content')
+
+<h1>Pedido: {{ pedido.id }}</h1>
+
+<div class="teste-grid">
+    <div class="teste-container" style="width: 30%">
+        <form action="{{ route('update.pedido', { pedido_id: pedido.id }) }}?_method=PUT" method="POST">
+            {{ csrfField() }}
+
+            <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+
+            <label for="tipo_id">Tipo</label>
+            <select id="selectTipo" class="form-control" name="tipo_id">
+                @each(tipo in tipos)
+                    <option {{ pedido.tipo_id == tipo.id ? 'selected' : '' }} value="{{ tipo.id }}" {{ old('tipo_id') == tipo.id ? 'selected' : '' }}>{{ tipo.nome }}</option>
+                    <!--<option value="{{ tipo.id }}" {{ old('tipo_id') == tipo.id ? 'selected' : '' }}>{{ tipo.nome }}</option>!-->
+                @endeach
+            </select>
+
+            @if(hasErrorFor('tipo_id'))
+                <span>
+                    {{ getErrorFor('tipo_id') }}
+                </span>
+            @endif
+
+            <div hidden id="divMesa">
+                <label id="labelMesa" for="mesa_id">Mesa</label>
+                <select id="selectMesa" class="form-control" name="mesa_id">
+                    @each(mesa in mesas)
+                        <option {{ pedido.mesa_id == mesa.id ? 'selected' : '' }} value="{{ mesa.id }}" {{ old('mesa_id') == mesa.id ? 'selected' : '' }}>Mesa nº {{ mesa.numero }}</option>
+                    @endeach
+                </select>
+                @if(hasErrorFor('mesa_id'))
+                    <span>
+                        {{ getErrorFor('mesa_id') }}
+                    </span>
+                @endif
+                <span {{ mesas == null || mesas.length == 0 ? '' : 'hidden' }} id="spanMesa">Não existem mesas vazias</span>
+            </div>
+
+            <div hidden id="divEnderecoEntrega">
+                <label for="enderecoEntrega">Endereço de Entrega</label>
+                <input id="inputEnderecoEntrega" class="form-control" type="text" name="enderecoEntrega" value="{{ old('enderecoEntrega', pedido.enderecoEntrega != null ? pedido.enderecoEntrega : '') }}" maxlength="200">
+                @if(hasErrorFor('enderecoEntrega'))
+                    <span id="spanEnderecoEntrega">
+                        {{ getErrorFor('enderecoEntrega') }}
+                    </span>
+                @endif
+            </div>
+
+            <label for="observacao">Observação</label>
+            <input id="inputObservacao" class="form-control" type="text" name="observacao" value="{{ old('observacao', pedido.observacao != null ? pedido.observacao : '') }}" maxlength="200">
+            @if(hasErrorFor('observacao'))
+                <span>
+                    {{ getErrorFor('observacao') }}
+                </span>
+            @endif
+
+            <label for="total">Total</label>
+            <input readonly class="form-control" type="number" name="total" value="{{ old('total', pedido.total) }}" min="0.01" max="9999.99" step="0.01">
+            @if(hasErrorFor('total'))
+                <span>
+                    {{ getErrorFor('total') }}
+                </span>
+            @endif
+
+            @if(flashMessage('updatePedidoError'))
+                <p></p>
+                <span>{{ flashMessage('updatePedidoError') }}</span>
+            @endif
+
+            @if(flashMessage('updateStatusMesaError'))
+                <p></p>
+                <span>{{ flashMessage('updateStatusMesaError') }}</span>
+            @endif
+
+            <button id="btnSalvar" type="submit">Salvar</button>
+        </form>
+    </div>
+
+    <p></p>
+
+    <div class="teste-container" style="width: 60%">
+        <!--<h4>Produtos do Pedido</h4>!-->
+        <p><a id="btnAdicionarProduto" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="0" data-qtd="1" data-produtoid="" data-observacao="">Adicionar produto</a></p>
+        <table class="table table-sm table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+                <th>Produto</th>
+                <th>Observação</th>
+                <th class="text-center" style="width: 50px">Qtd.</th>
+                <th class="text-right" style="width: 130px">Preço Un. (R$)</th>
+                <th class="text-right" style="width: 100px">Total (R$)</th>
+                <th class="text-center" style="width: 100px">Ações</th>
+            </thead>
+        
+            @if(pedidoProdutos.length > 0)
+                <tbody>
+                    @each(pedidoProduto in pedidoProdutos)
+                        <tr>
+                            <td>{{ pedidoProduto.produto.nome }}</td>
+                            <td>{{ pedidoProduto.observacao != null ? pedidoProduto.observacao : '' }}</td>
+                            <td class="text-center">{{ pedidoProduto.quantidade }}</td>
+                            <td class="text-right">{{ pedidoProduto.precoUnitario }}</td>
+                            <td class="text-right">{{ pedidoProduto.quantidade * pedidoProduto.precoUnitario }}</td>
+                            <td class="text-center">
+                                <form action="{{ route('destroy.produto-pedido', { id: pedidoProduto.id }) }}?_method=DELETE" method="POST">
+                                    {{ csrfField() }}
+                                    
+                                    <a type="button" class="btn btn-primary btn-sm" data-placement="right" title="Alterar produto" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="{{ pedidoProduto.id }}" data-qtd="{{ pedidoProduto.quantidade }}" data-produtoid="{{ pedidoProduto.produto_id }}" data-observacao="{{ pedidoProduto.observacao }}">
+                                        <i class="fas fa-edit fa-sm"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-danger btn-sm classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
+                                        <i class="far fa-trash-alt fa-sm"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>                    
+                    @endeach
+                </tbody>
+            @endif
+        </table>
+
+        @if(flashMessage('deleteProdutoPedidoError'))
+            <p></p>
+            <span>{{ flashMessage('deleteProdutoPedidoError') }}</span>
+        @endif
+
+        @if(flashMessage('updateProdutoPedidoError'))
+            <p></p>
+            <span>{{ flashMessage('updateProdutoPedidoError') }}</span>
+        @endif
+
+    </div>
+</div>
+
+<!-- Modal Produto Pedido -->
+<div class="modal fade" id="modalProdutoPedido" tabindex="-1" role="dialog" aria-labelledby="modalProdutoPedidoLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="formModalProdutoPedido" action="{{ route('store.produto-pedido') }}" method="POST">
+                {{ csrfField() }}
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalProdutoPedidoLabel">Adicionar Produto</h5>
+                </div>
+                <div class="modal-body">
+
+                    <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+
+                    <label for="produto_id">Produto</label>
+                    <select id="selectProduto" class="form-control" name="produto_id" required>
+                        <option value="" disabled selected hidden>Selecione um produto</option>
+                        @each(produto in produtos)
+                            <option data-precovenda="{{ produto.precoVenda }}" value="{{ produto.id }}" {{ old('produto_id') == produto.id ? 'selected' : '' }}>{{ produto.nome }}</option>
+                        @endeach
+                    </select>
+
+                    <label for="quantidade">Quantidade</label>
+                    <input id="inputQuantidade" class="form-control" type="number" name="quantidade" value="{{ old('quantidade', 1) }}" min="1" max="999" step="1">
+
+                    <label for="precoUnitario">Preço Unitário</label>
+                    <input id="inputPrecoUnitario" readonly class="form-control" type="number" name="precoUnitario" value="{{ old('precoUnitario') }}">
+
+                    <label>Preço Total</label>
+                    <input id="inputPrecoTotal" readonly class="form-control" type="number">
+
+                    <label for="observacao">Observação</label>
+                    <input id="inputObservacaoProduto" class="form-control" type="text" name="observacao" maxlength="200">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary classe-excluir" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary classe-excluir">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var select = document.getElementById('selectTipo');
+        configuraCamposPeloTipoPedido(select.options[select.selectedIndex].value);
+
+        calculaPrecoTotal();
+    })
+
+    $('#selectTipo').change(function(event) {
+        configuraCamposPeloTipoPedido(event.currentTarget.value);
+    })
+
+    $('#selectMesa').change(function(event) {
+        $('#inputObservacao').focus();
+    })
+
+    $('#selectProduto').change(function(event) {
+        calculaPrecoTotal();
+    })
+
+    $('#inputQuantidade').change(function(event) {
+        calculaPrecoTotal();
+    })
+
+    $('#modalProdutoPedido').on('show.bs.modal', function (event) {
+        var modal = $(this);
+        var button = $(event.relatedTarget);
+
+        var id = button.data('pedidoprodutoid');
+        if (id == 0) {
+            modal.find('#formModalProdutoPedido').attr('action', '/api/adicionarProdutoPedido/');
+            modal.find('#modalProdutoPedidoLabel').text('Adicionar Produto');
+        } else {
+            modal.find('#formModalProdutoPedido').attr('action', '/api/alterarProdutoPedido/' + id + '?_method=PUT');
+            modal.find('#modalProdutoPedidoLabel').text('Alterar Produto');
+        }
+
+        var qtd = button.data('qtd');
+        modal.find('#inputQuantidade').val(qtd);
+
+        var produto = button.data('produtoid');
+        modal.find('#selectProduto').val(produto).change();
+
+        var observacao = button.data('observacao');
+        modal.find('#inputObservacaoProduto').val(observacao);
+    })
+
+    function calculaPrecoTotal() {
+        var precovenda = $('#selectProduto').find(':selected').data('precovenda');
+        var qtd = $('#inputQuantidade').val();
+        $('#inputPrecoUnitario').val(precovenda);
+        $('#inputPrecoTotal').val(precovenda * qtd);
+    }
+
+    function configuraCamposPeloTipoPedido(tipo) {
+        consumirNoLocal = tipo == 1;
+        delivery = tipo == 3;
+
+        $("#divMesa").prop("hidden", !consumirNoLocal);
+        $("#divEnderecoEntrega").prop("hidden", !delivery);
+        $("#selectMesa").prop("required", consumirNoLocal);
+
+        $('#inputObservacao').focus();
+        if(consumirNoLocal) { $('#selectMesa').focus(); }
+        if(delivery) { $('#inputEnderecoEntrega').focus(); }
+    }
+</script>
+
+@endsection

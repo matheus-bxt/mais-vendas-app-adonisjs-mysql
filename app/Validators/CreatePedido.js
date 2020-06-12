@@ -2,7 +2,11 @@
 
 class CreatePedido {
   get rules () {
-    if(this.ctx.params.mesaSelecionadaId > 0) {
+    const { tipo_id } = this.ctx.request.all();
+    const consumirNoLocal = 1;
+    const delivery = 3;
+
+    if (tipo_id == consumirNoLocal) {
       return {
         'filial_id': 'required',
         'tipo_id': 'required',
@@ -10,33 +14,33 @@ class CreatePedido {
         'observacao': 'max:200',
         'total': 'required'
       }
+    } else if (tipo_id == delivery) {
+      return {
+        'filial_id': 'required',
+        'tipo_id': 'required',
+        'enderecoEntrega': 'required|max:200',
+        'observacao': 'max:200',
+        'total': 'required'
+      }
     } else {
-      const { tipo_id } = this.ctx.request.all();
-      //3 - Delivery
-      if(tipo_id == 3) {
-        return {
-          'filial_id': 'required',
-          'tipo_id': 'required',
-          'enderecoEntrega': 'required|max:200',
-          'observacao': 'max:200',
-          'total': 'required'
-        }
-      } else {
-        return {
-          'filial_id': 'required',
-          'tipo_id': 'required',
-          'observacao': 'max:200',
-          'total': 'required'
-        }
+      return {
+        'filial_id': 'required',
+        'tipo_id': 'required',
+        'observacao': 'max:200',
+        'total': 'required'
       }
     }
   }
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',
-      'observacao.max': '{{ field }} deve ter no máximo 200 caracteres',
-      'enderecoEntrega.max': '{{ field }} deve ter no máximo 200 caracteres'
+      'filial_id.required': 'Filial é um campo obrigatório',
+      'tipo_id.required': 'Tipo é um campo obrigatório',
+      'mesa_id.required': 'Mesa é um campo obrigatório',
+      'enderecoEntrega.required': 'Endereço de Entrega é um campo obrigatório',
+      'enderecoEntrega.max': 'Endereço de Entrega deve ter no máximo 200 caracteres',
+      'observacao.max': 'Observação deve ter no máximo 200 caracteres',
+      'total.required': 'Total é um campo obrigatório'
     }
   }
 

@@ -18,9 +18,13 @@ MaisVendas - Cadastrar Pedido
         {{ csrfField() }}
 
         <input type="hidden" name="filial_id" value="{{ filialLogada.id }}">
+        <input disabled type="hidden" id="inputMesaSelecionada" value="{{ mesaSelecionadaId }}">
 
         <label for="tipo_id">Tipo</label>
-        <select id="selectTipo" class="form-control" name="tipo_id">
+        <select id="selectTipo" class="form-control" name="tipo_id" required>
+            @if(mesaSelecionadaId == null || mesaSelecionadaId == 0)
+                <option value="" disabled selected hidden>Selecione o tipo do pedido</option>
+            @endif
             @each(tipo in tipos)
                 <option value="{{ tipo.id }}" {{ old('tipo_id') == tipo.id ? 'selected' : '' }}>{{ tipo.nome }}</option>
             @endeach
@@ -34,9 +38,10 @@ MaisVendas - Cadastrar Pedido
 
         <div hidden id="divMesa">
             <label id="labelMesa" for="mesa_id">Mesa</label>
-            <select id="selectMesa" class="form-control" name="mesa_id">
+            <select id="selectMesa" class="form-control" name="mesa_id" required>
+                <option value="" disabled selected hidden>Selecione a mesa</option>
                 @each(mesa in mesas)
-                    <option value="{{ mesa.id }}" {{ old('mesa_id') == mesa.id ? 'selected' : '' }}>Mesa nº {{ mesa.numero }}</option>
+                    <option {{ mesaSelecionadaId == mesa.id ? 'selected' : '' }} value="{{ mesa.id }}" {{ old('mesa_id') == mesa.id ? 'selected' : '' }}>Mesa nº {{ mesa.numero }}</option>
                 @endeach
             </select>
             @if(hasErrorFor('mesa_id'))
@@ -47,16 +52,18 @@ MaisVendas - Cadastrar Pedido
             <span {{ mesas == null || mesas.length == 0 ? '' : 'hidden' }} id="spanMesa">Não existem mesas vazias</span>
         </div>
 
-        <label hidden id="labelEnderecoEntrega" for="enderecoEntrega">Endereço de Entrega</label>
-        <input hidden id="inputEnderecoEntrega" class="form-control" type="text" name="enderecoEntrega" value="{{ old('enderecoEntrega', '') }}" maxlength="200">
-        @if(hasErrorFor('enderecoEntrega'))
-            <span id="spanEnderecoEntrega">
-                {{ getErrorFor('enderecoEntrega') }}
-            </span>
-        @endif
+        <div hidden id="divEnderecoEntrega">
+            <label for="enderecoEntrega">Endereço de Entrega</label>
+            <input id="inputEnderecoEntrega" class="form-control" type="text" name="enderecoEntrega" value="{{ old('enderecoEntrega', '') }}" maxlength="200">
+            @if(hasErrorFor('enderecoEntrega'))
+                <span id="spanEnderecoEntrega">
+                    {{ getErrorFor('enderecoEntrega') }}
+                </span>
+            @endif
+        </div>
 
         <label for="observacao">Observação</label>
-        <input class="form-control" type="text" name="observacao" value="{{ old('observacao', '') }}" maxlength="200">
+        <input id="inputObservacao" class="form-control" type="text" name="observacao" value="{{ old('observacao', '') }}" maxlength="200">
         @if(hasErrorFor('observacao'))
             <span>
                 {{ getErrorFor('observacao') }}
@@ -64,7 +71,7 @@ MaisVendas - Cadastrar Pedido
         @endif
 
         <label for="total">Total</label>
-        <input class="form-control" type="number" name="total" value="{{ old('total', '') }}" min="0.01" max="9999.99" step="0.01">
+        <input readonly class="form-control" type="number" name="total" value="{{ old('total', '0') }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('total'))
             <span>
                 {{ getErrorFor('total') }}
@@ -76,38 +83,46 @@ MaisVendas - Cadastrar Pedido
             <span>{{ flashMessage('storePedidoError') }}</span>
         @endif
 
-        <button type="submit">Salvar</button>
-    </form>
+        @if(flashMessage('updateStatusMesaError'))
+            <p></p>
+            <span>{{ flashMessage('updateStatusMesaError') }}</span>
+        @endif
+
+        <button type="submit">Adicionar Produtos</button>
+    </form>    
 </div>
 
 <script>
     $(document).ready(function() {
-        var select = document.getElementById('selectTipo');
-        configurarVisibilidade(select.options[select.selectedIndex].value);
+        var selectTipo = document.getElementById('selectTipo');
+        configuraCamposPeloTipoPedido(selectTipo.options[selectTipo.selectedIndex].value);
+        selectTipo.focus();
+
+        var inputMesaSelecionada = document.getElementById('inputMesaSelecionada');
+        if (inputMesaSelecionada.value > 0) {
+            $('#inputObservacao').focus();
+        }
     })
 
     $('#selectTipo').change(function(event) {
-        configurarVisibilidade(event.currentTarget.value);
+        configuraCamposPeloTipoPedido(event.currentTarget.value);
     })
 
-    function configurarVisibilidade(tipo) {
+    $('#selectMesa').change(function(event) {
+        $('#inputObservacao').focus();
+    })
+
+    function configuraCamposPeloTipoPedido(tipo) {
         consumirNoLocal = tipo == 1;
         delivery = tipo == 3;
 
-        // $("#labelMesa").prop("hidden", !consumirNoLocal);
-        // $("#selectMesa").prop("hidden", !consumirNoLocal);
         $("#divMesa").prop("hidden", !consumirNoLocal);
+        $("#divEnderecoEntrega").prop("hidden", !delivery);
+        $("#selectMesa").prop("required", consumirNoLocal);
 
-        $("#labelEnderecoEntrega").prop("hidden", !delivery);
-        $("#inputEnderecoEntrega").prop("hidden", !delivery);
-        $("#spanEnderecoEntrega").prop("hidden", !delivery);
-
-        if(consumirNoLocal) {
-            document.getElementById('selectMesa').focus();
-        }
-        if(delivery) {
-            document.getElementById('inputEnderecoEntrega').focus();
-        }
+        $('#inputObservacao').focus();
+        if(consumirNoLocal) { $('#selectMesa').focus(); }
+        if(delivery) { $('#inputEnderecoEntrega').focus(); }
     }
 </script>
 
