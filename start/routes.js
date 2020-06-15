@@ -50,6 +50,7 @@ Route.group('userauth', () => {
         Route.get('/cadastrarPedido/:mesaSelecionadaId?', 'PedidoController.cadastrarPedidoView').as('view.cadastrarPedido');
         Route.get('/alterarPedido/:pedido_id?', 'PedidoController.alterarPedidoView').as('view.alterarPedido');
         Route.get('/adicionarProdutos/pedido/:pedido_id?', 'PedidoController.alterarPedidoView').as('view.adicionarProdutos-pedido');
+        Route.get('/gerenciarPedido/mesa/:mesa_id', 'PedidoController.gerenciarPedidoView').as('view.gerenciarPedido-mesa');
 
     //CREATE
         Route.post('/cadastrarFilial', 'FilialController.store').as('store.filial').prefix('api').validator('CreateFilial').middleware(['admin']);

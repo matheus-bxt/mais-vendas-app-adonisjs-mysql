@@ -107,10 +107,12 @@ class PedidoController {
     }
 
     const tipos = await TipoPedido.all();
+
+    const mesaStatusVazia = 1;
     const mesas = await Mesa
     .query()
     .where('filial_id', auth.user.filial_id)
-    .andWhere('status_id', 1)
+    .andWhere('status_id', mesaStatusVazia)
     .orWhere('id', pedido.mesa_id)
     .fetch();
 
@@ -127,6 +129,34 @@ class PedidoController {
     .fetch();
 
     return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON(), tipos: tipos.toJSON(), mesas: mesas.toJSON(), pedidoProdutos: pedidoProdutos.toJSON(), produtos: produtos.toJSON() });
+  }
+
+  async gerenciarPedidoView({ view, params, session, response, auth }) {
+    var mesa = await Mesa.findBy('id', params.mesa_id);
+    if (mesa == null) {
+      //retorna mensagem de erro para informar não foi encontrada a mesa com o id informado
+      session.flash({gerenciarPedidoError: 'Não foi encontrada a mesa com o id informado!'})
+      return response.redirect('back');
+    }
+
+    const pedidoStatusPago = 6;
+    const pedido = await Pedido
+    .query()
+    .where('mesa_id', mesa.id)
+    .andWhere('status_id', '<>', pedidoStatusPago)
+    .fetch();
+
+    if (pedido.rows[0] == null) {
+      const mesaStatusVazia = 1;
+      mesa.status_id = mesaStatusVazia;
+      await mesa.save();
+
+      session.flash({gerenciarPedidoError: 'Não foi encontrado nenhum pedido para esta mesa ou o pedido já foi pago!'})
+      return response.redirect('back');
+    }
+
+    const pedido_id = pedido.rows[0].id;
+    return response.redirect(`/alterarPedido/${pedido_id}`, true);
   }
 
   async storeProdutoPedido({ request, view, params, session, response, auth }) {
