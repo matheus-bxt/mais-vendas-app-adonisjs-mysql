@@ -13,7 +13,7 @@ MaisVendas - Alterar Despesa
 
 <h1>Alterar Despesa</h1>
 
-<div class="teste-container">
+<div class="container-filho">
     <form action="{{ route('update.despesa', { despesa_id: despesa.id }) }}?_method=PUT" method="POST">
         {{ csrfField() }}
 

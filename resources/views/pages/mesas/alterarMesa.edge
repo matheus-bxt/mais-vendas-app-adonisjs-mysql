@@ -13,7 +13,7 @@ MaisVendas - Alterar Mesa
 
 <h1>Alterar Mesa</h1>
 
-<div class="teste-container">
+<div class="container-filho">
     <form action="{{ route('update.mesa', { mesa_id: mesa.id }) }}?_method=PUT" method="POST">
         {{ csrfField() }}
 

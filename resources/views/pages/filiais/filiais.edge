@@ -15,56 +15,56 @@ MaisVendas - Filiais
 <h1 style="padding: 15px 0 15px 100px">Filiais</h1>
 
 <p><a href="{{ route('view.cadastrarFilial') }}" type="button" class="btn btn-success">Cadastrar nova filial</a></p>
-<table class="table table-bordered table-hover table-striped">
-    <thead class="thead-dark">
-        <th class="text-center" style="width: 60px">#</th>
-        <th>Nome</th>
-        <th style="width: 180px">CNPJ</th>
-        <th style="width: 180px">Telefone</th>
-        <th>Endereço</th>
-        <th class="text-center" style="width: 130px">Ações</th>
-    </thead>
-
-    @if(filiais.length > 0)
-        <tbody>
-            @each(filial in filiais)
-                <tr style="{{ filial.id == auth.user.filial_id ? 'color: rgba(27, 193, 169, 100); font-weight: bold;' : '' }}">            
-                    <td class="text-center" >{{ filial.id }}</td>
-                    <td>{{ filial.nome }}</td>
-                    <td>{{ filial.cnpj }}</td>
-                    <td>{{ filial.telefone }}</td>
-                    <td>{{ filial.endereco }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('destroy.filial', { filial_id: filial.id }) }}?_method=DELETE" method="POST">
-                            {{ csrfField() }}
-
-                            <a type="button" href="{{ route('view.alterarFilial', { filial_id: filial.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar filial">
-                                <i class="fas fa-edit fa-sm"></i>
-                            </a>
-                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir filial">
-                                <i class="far fa-trash-alt fa-sm"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>                    
-            @endeach
-        </tbody>
-    @endif
-</table>
 
 @if(flashMessage('openToEditFilialError'))
-    <p></p>
-    <span>{{ flashMessage('openToEditFilialError') }}</span>
+    <p><span>{{ flashMessage('openToEditFilialError') }}</span></p>
 @endif
 
 @if(flashMessage('deleteFilialError'))
-    <p></p>
-    <span>{{ flashMessage('deleteFilialError') }}</span>
+    <p><span>{{ flashMessage('deleteFilialError') }}</span></p>
 @endif
 
 @if(flashMessage('updateFilialError'))
-    <p></p>
-    <span>{{ flashMessage('updateFilialError') }}</span>
+    <p><span>{{ flashMessage('updateFilialError') }}</span></p>
 @endif
+
+<div class="table-scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+            <th class="text-center" style="width: 60px">#</th>
+            <th>Nome</th>
+            <th style="width: 180px">CNPJ</th>
+            <th style="width: 180px">Telefone</th>
+            <th>Endereço</th>
+            <th class="text-center" style="width: 130px">Ações</th>
+        </thead>
+
+        @if(filiais.length > 0)
+            <tbody>
+                @each(filial in filiais)
+                    <tr style="{{ filial.id == auth.user.filial_id ? 'color: rgba(27, 193, 169, 100); font-weight: bold;' : '' }}">            
+                        <td class="text-center" >{{ filial.id }}</td>
+                        <td>{{ filial.nome }}</td>
+                        <td>{{ filial.cnpj }}</td>
+                        <td>{{ filial.telefone }}</td>
+                        <td>{{ filial.endereco }}</td>
+                        <td class="text-center">
+                            <form action="{{ route('destroy.filial', { filial_id: filial.id }) }}?_method=DELETE" method="POST">
+                                {{ csrfField() }}
+
+                                <a type="button" href="{{ route('view.alterarFilial', { filial_id: filial.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar filial">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </a>
+                                <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir filial">
+                                    <i class="far fa-trash-alt fa-sm"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>                    
+                @endeach
+            </tbody>
+        @endif
+    </table>
+</div>
 
 @endsection

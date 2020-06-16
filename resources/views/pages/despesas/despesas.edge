@@ -15,54 +15,64 @@ MaisVendas - Despesas
 <h1 style="padding: 15px 0 15px 100px">Despesas</h1>
 
 <p><a href="{{ route('view.cadastrarDespesa') }}" type="button" class="btn btn-success">Cadastrar nova despesa</a></p>
-<table class="table table-bordered table-hover table-striped">
-    <thead class="thead-dark">
-        <th class="text-center" style="width: 100px">#</th>
-        <th>Descrição</th>
-        <th class="text-center" style="width: 150px">Data</th>
-        <th class="text-right" style="width: 150px">Valor (R$)</th>
-        <th class="text-center" style="width: 150px">Ações</th>
-    </thead>
-
-    @if(despesas.length > 0)
-        <tbody>
-            @each(despesa in despesas)
-                <tr>
-                    <td class="text-center">{{ despesa.id }}</td>
-                    <td>{{ despesa.descricao }}</td>
-                    <td class="text-center">{{ despesa.data }}</td>
-                    <td class="text-right">{{ despesa.valor }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('destroy.despesa', { despesa_id: despesa.id }) }}?_method=DELETE" method="POST">
-                            {{ csrfField() }}
-
-                            <a type="button" href="{{ route('view.alterarDespesa', { despesa_id: despesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar despesa">
-                                <i class="fas fa-edit fa-sm"></i>
-                            </a>
-                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir despesa">
-                                <i class="far fa-trash-alt fa-sm"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>                    
-            @endeach
-        </tbody>
-    @endif
-</table>
 
 @if(flashMessage('openToEditDespesaError'))
-    <p></p>
-    <span>{{ flashMessage('openToEditDespesaError') }}</span>
+    <p><span>{{ flashMessage('openToEditDespesaError') }}</span></p>
 @endif
 
 @if(flashMessage('deleteDespesaError'))
-    <p></p>
-    <span>{{ flashMessage('deleteDespesaError') }}</span>
+    <p><span>{{ flashMessage('deleteDespesaError') }}</span></p>
 @endif
 
 @if(flashMessage('updateDespesaError'))
-    <p></p>
-    <span>{{ flashMessage('updateDespesaError') }}</span>
+    <p><span>{{ flashMessage('updateDespesaError') }}</span></p>
 @endif
+
+<div class="table-scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+            <th class="text-center" style="width: 100px">#</th>
+            <th>Descrição</th>
+            <th class="text-center" style="width: 150px">Data</th>
+            <th class="text-right" style="width: 150px">Valor (R$)</th>
+            <th class="text-center" style="width: 150px">Ações</th>
+        </thead>
+
+        @if(despesas.length > 0)
+            <tbody>
+                @each(despesa in despesas)
+                    <tr>
+                        <td class="text-center">{{ despesa.id }}</td>
+                        <td>{{ despesa.descricao }}</td>
+                        <td class="text-center td-tipo-data">{{ despesa.data }}</td>
+                        <td class="text-right">{{ despesa.valor }}</td>
+                        <td class="text-center">
+                            <form action="{{ route('destroy.despesa', { despesa_id: despesa.id }) }}?_method=DELETE" method="POST">
+                                {{ csrfField() }}
+
+                                <a type="button" href="{{ route('view.alterarDespesa', { despesa_id: despesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar despesa">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </a>
+                                <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir despesa">
+                                    <i class="far fa-trash-alt fa-sm"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>                    
+                @endeach
+            </tbody>
+        @endif
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.td-tipo-data').each(function(i) {
+            var data = $(this).text();
+            var split = data.split('-');
+            $(this).text(split[2] + '/' + split[1] + '/' + split[0]);
+        })
+    })
+</script>
 
 @endsection

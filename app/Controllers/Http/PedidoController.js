@@ -174,7 +174,7 @@ class PedidoController {
     pedido.total = await this.calcularTotalPedido(pedido);
     await pedido.save();
 
-    return response.redirect(`/adicionarProdutos/pedido/${dados.pedido_id}`, true);
+    return response.redirect('back');
   }
 
   /**

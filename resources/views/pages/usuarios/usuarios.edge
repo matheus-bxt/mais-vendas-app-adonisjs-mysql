@@ -15,56 +15,56 @@ MaisVendas - Usuários
 <h1 style="padding: 15px 0 15px 100px">Usuários</h1>
 
 <p><a href="{{ route('view.cadastrarUsuario') }}" type="button" class="btn btn-success">Cadastrar novo usuário</a></p>
-<table class="table table-bordered table-hover table-striped">
-    <thead class="thead-dark">
-        <th class="text-center">#</th>
-        <th>Nome</th>
-        <th style="width: 320px">Login</th>
-        <th style="width: 80px">Admin?</th>
-        <th>Filial</th>
-        <th class="text-center" style="width: 130px">Ações</th>
-    </thead>
-
-    @if(usuarios.length > 0)
-        <tbody>
-            @each(usuario in usuarios)                
-                <tr style="{{ usuario.id == auth.user.id ? 'color: rgba(27, 193, 169, 100); font-weight: bold;' : '' }}">
-                    <td class="text-center" style="width: 60px">{{ usuario.id }}</td>
-                    <td>{{ usuario.nome }}</td>
-                    <td>{{ usuario.login }}</td>
-                    <td class="text-center">{{ usuario.admin == 1 ? 'Sim' : 'Não' }}</td>                    
-                    <td>{{ usuario.filial.nome }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('destroy.usuario', { usuario_id: usuario.id }) }}?_method=DELETE" method="POST">
-                            {{ csrfField() }}
-
-                            <a type="button" href="{{ route('view.alterarUsuario', { usuario_id: usuario.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar usuário">
-                                <i class="fas fa-edit fa-sm"></i>
-                            </a>
-                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir usuário">
-                                <i class="far fa-trash-alt fa-sm"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>                    
-            @endeach
-        </tbody>
-    @endif
-</table>
 
 @if(flashMessage('openToEditUsuarioError'))
-    <p></p>
-    <span>{{ flashMessage('openToEditUsuarioError') }}</span>
+    <p><span>{{ flashMessage('openToEditUsuarioError') }}</span></p>
 @endif
 
 @if(flashMessage('deleteUsuarioError'))
-    <p></p>
-    <span>{{ flashMessage('deleteUsuarioError') }}</span>
+    <p><span>{{ flashMessage('deleteUsuarioError') }}</span></p>
 @endif
 
 @if(flashMessage('updateUsuarioError'))
-    <p></p>
-    <span>{{ flashMessage('updateUsuarioError') }}</span>
+    <p><span>{{ flashMessage('updateUsuarioError') }}</span></p>
 @endif
+
+<div class="table-scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+            <th class="text-center">#</th>
+            <th>Nome</th>
+            <th style="width: 320px">Login</th>
+            <th style="width: 80px">Admin?</th>
+            <th>Filial</th>
+            <th class="text-center" style="width: 130px">Ações</th>
+        </thead>
+
+        @if(usuarios.length > 0)
+            <tbody>
+                @each(usuario in usuarios)                
+                    <tr style="{{ usuario.id == auth.user.id ? 'color: rgba(27, 193, 169, 100); font-weight: bold;' : '' }}">
+                        <td class="text-center" style="width: 60px">{{ usuario.id }}</td>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.login }}</td>
+                        <td class="text-center">{{ usuario.admin == 1 ? 'Sim' : 'Não' }}</td>                    
+                        <td>{{ usuario.filial.nome }}</td>
+                        <td class="text-center">
+                            <form action="{{ route('destroy.usuario', { usuario_id: usuario.id }) }}?_method=DELETE" method="POST">
+                                {{ csrfField() }}
+
+                                <a type="button" href="{{ route('view.alterarUsuario', { usuario_id: usuario.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar usuário">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </a>
+                                <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir usuário">
+                                    <i class="far fa-trash-alt fa-sm"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>                    
+                @endeach
+            </tbody>
+        @endif
+    </table>
+</div>
 
 @endsection

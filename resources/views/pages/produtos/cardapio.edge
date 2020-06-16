@@ -15,58 +15,58 @@ MaisVendas - Produtos
 <h1 style="padding: 15px 0 15px 100px">Cardápio</h1>
 
 <p><a href="{{ route('view.cadastrarProduto') }}" type="button" class="btn btn-success">Cadastrar novo produto</a></p>
-<table class="table table-bordered table-hover table-striped">
-    <thead class="thead-dark">
-        <th class="text-center" style="width: 60px">#</th>
-        <th>Produto</th>
-        <th>Código</th>
-        <th>Descrição / Ingredientes</th>
-        <th class="text-right" style="width: 110px">Custo (R$)</th>
-        <th class="text-right" style="width: 160px">Preço Venda (R$)</th>
-        <th class="text-center" style="width: 130px">Ações</th>
-    </thead>
-
-    @if(produtos.length > 0)
-        <tbody>
-            @each(produto in produtos)
-                <tr>
-                    <td class="text-center">{{ produto.id }}</td>
-                    <td>{{ produto.nome }}</td>
-                    <td>{{ produto.codigo }}</td>
-                    <td>{{ produto.descricao != null ? produto.descricao : '' }}</td>
-                    <td class="text-right">{{ produto.custo }}</td>
-                    <td class="text-right">{{ produto.precoVenda }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('destroy.produto', { produto_id: produto.id }) }}?_method=DELETE" method="POST">
-                            {{ csrfField() }}
-
-                            <a type="button" href="{{ route('view.alterarProduto', { produto_id: produto.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar produto">
-                                <i class="fas fa-edit fa-sm"></i>
-                            </a>
-                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
-                                <i class="far fa-trash-alt fa-sm"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>                    
-            @endeach
-        </tbody>
-    @endif
-</table>
 
 @if(flashMessage('openToEditProdutoError'))
-    <p></p>
-    <span>{{ flashMessage('openToEditProdutoError') }}</span>
+    <p><span>{{ flashMessage('openToEditProdutoError') }}</span></p>
 @endif
 
 @if(flashMessage('deleteProdutoError'))
-    <p></p>
-    <span>{{ flashMessage('deleteProdutoError') }}</span>
+    <p><span>{{ flashMessage('deleteProdutoError') }}</span></p>
 @endif
 
 @if(flashMessage('updateProdutoError'))
-    <p></p>
-    <span>{{ flashMessage('updateProdutoError') }}</span>
+    <p><span>{{ flashMessage('updateProdutoError') }}</span></p>
 @endif
+
+<div class="table-scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+            <th class="text-center" style="width: 60px">#</th>
+            <th>Produto</th>
+            <th>Código</th>
+            <th>Descrição / Ingredientes</th>
+            <th class="text-right" style="width: 110px">Custo (R$)</th>
+            <th class="text-right" style="width: 160px">Preço Venda (R$)</th>
+            <th class="text-center" style="width: 130px">Ações</th>
+        </thead>
+    
+        @if(produtos.length > 0)
+            <tbody>
+                @each(produto in produtos)
+                    <tr>
+                        <td class="text-center">{{ produto.id }}</td>
+                        <td>{{ produto.nome }}</td>
+                        <td>{{ produto.codigo }}</td>
+                        <td>{{ produto.descricao != null ? produto.descricao : '' }}</td>
+                        <td class="text-right">{{ produto.custo }}</td>
+                        <td class="text-right">{{ produto.precoVenda }}</td>
+                        <td class="text-center">
+                            <form action="{{ route('destroy.produto', { produto_id: produto.id }) }}?_method=DELETE" method="POST">
+                                {{ csrfField() }}
+    
+                                <a type="button" href="{{ route('view.alterarProduto', { produto_id: produto.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar produto">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </a>
+                                <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
+                                    <i class="far fa-trash-alt fa-sm"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>                    
+                @endeach
+            </tbody>
+        @endif
+    </table>
+</div>
 
 @endsection

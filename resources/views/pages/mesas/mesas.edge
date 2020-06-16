@@ -15,71 +15,69 @@ MaisVendas - Mesas
 <h1 style="padding: 15px 0 15px 100px">Mesas</h1>
 
 <p><a href="{{ route('view.cadastrarMesa') }}" type="button" class="btn btn-success">Cadastrar nova mesa</a></p>
-<table class="table table-bordered table-hover table-striped">
-    <thead class="thead-dark">
-        <th class="text-center" style="width: 100px">Mesa nº</th>
-        <th class="text-center" style="width: 150px">Status</th>
-        <th class="text-center" style="width: 230px">Pedido</th>
-        <th>Nome da Mesa</th>        
-        <th class="text-center" style="width: 130px">Ações</th>
-    </thead>
-
-    @if(mesas.length > 0)
-        <tbody>
-            @each(mesa in mesas)
-                <!--<tr style="font-weight: bold; {{ mesa.status.codigo == 1 ? 'color: green;' : 'color: orange;' }}">!-->
-                <tr>
-                    <td class="text-center">{{ mesa.numero }}</td>
-                    <td class="text-center">{{ mesa.status.nome }}</td>
-                    <td class="text-center">
-                        @if(mesa.status.id == 1)
-                            <a type="button" href="{{ route('view.cadastrarPedido', { mesaSelecionadaId: mesa.id }) }}" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="right">Cadastrar pedido</a>
-                        @else
-                            <a type="button" href="{{ route('view.gerenciarPedido-mesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-warning" style="background-color: orange;" data-toggle="tooltip" data-placement="right">Gerenciar pedido</a>
-                        @endif
-                    </td>
-                    <td>{{ mesa.nome }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('destroy.mesa', { mesa_id: mesa.id }) }}?_method=DELETE" method="POST">
-                            {{ csrfField() }}
-                            
-                            <a type="button" href="{{ route('view.alterarMesa', { mesa_id: mesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar mesa">
-                                <i class="fas fa-edit fa-sm"></i>
-                            </a>
-                            <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir mesa">
-                                <i class="far fa-trash-alt fa-sm"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>                    
-            @endeach
-        </tbody>
-    @endif
-</table>
 
 @if(flashMessage('openToEditMesaError'))
-    <p></p>
-    <span>{{ flashMessage('openToEditMesaError') }}</span>
+    <p><span>{{ flashMessage('openToEditMesaError') }}</span></p>
 @endif
 
 @if(flashMessage('adminOnlyError'))
-    <p></p>
-    <span>{{ flashMessage('adminOnlyError') }}</span>
+    <p><span>{{ flashMessage('adminOnlyError') }}</span></p>
 @endif
 
 @if(flashMessage('deleteMesaError'))
-    <p></p>
-    <span>{{ flashMessage('deleteMesaError') }}</span>
+    <p><span>{{ flashMessage('deleteMesaError') }}</span></p>
 @endif
 
 @if(flashMessage('updateMesaError'))
-    <p></p>
-    <span>{{ flashMessage('updateMesaError') }}</span>
+    <p><span>{{ flashMessage('updateMesaError') }}</span></p>
 @endif
 
 @if(flashMessage('gerenciarPedidoError'))
-    <p></p>
-    <span>{{ flashMessage('gerenciarPedidoError') }}</span>
+    <p><span>{{ flashMessage('gerenciarPedidoError') }}</span></p>
 @endif
+
+<div class="table-scroll">
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="thead-dark">
+            <th class="text-center" style="width: 100px">Mesa nº</th>
+            <th class="text-center" style="width: 150px">Status</th>
+            <th class="text-center" style="width: 230px">Pedido</th>
+            <th>Nome da Mesa</th>        
+            <th class="text-center" style="width: 130px">Ações</th>
+        </thead>
+
+        @if(mesas.length > 0)
+            <tbody>
+                @each(mesa in mesas)
+                    <!--<tr style="font-weight: bold; {{ mesa.status.codigo == 1 ? 'color: green;' : 'color: orange;' }}">!-->
+                    <tr>
+                        <td class="text-center">{{ mesa.numero }}</td>
+                        <td class="text-center">{{ mesa.status.nome }}</td>
+                        <td class="text-center">
+                            @if(mesa.status.id == 1)
+                                <a type="button" href="{{ route('view.cadastrarPedido', { mesaSelecionadaId: mesa.id }) }}" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="right">Cadastrar pedido</a>
+                            @else
+                                <a type="button" href="{{ route('view.gerenciarPedido-mesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-warning" style="background-color: orange;" data-toggle="tooltip" data-placement="right">Gerenciar pedido</a>
+                            @endif
+                        </td>
+                        <td>{{ mesa.nome }}</td>
+                        <td class="text-center">
+                            <form action="{{ route('destroy.mesa', { mesa_id: mesa.id }) }}?_method=DELETE" method="POST">
+                                {{ csrfField() }}
+                                
+                                <a type="button" href="{{ route('view.alterarMesa', { mesa_id: mesa.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar mesa">
+                                    <i class="fas fa-edit fa-sm"></i>
+                                </a>
+                                <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir mesa">
+                                    <i class="far fa-trash-alt fa-sm"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>                    
+                @endeach
+            </tbody>
+        @endif
+    </table>
+</div>
 
 @endsection

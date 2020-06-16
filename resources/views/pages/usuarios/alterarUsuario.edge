@@ -13,7 +13,7 @@ MaisVendas - Alterar Usuário
 
 <h1>Alterar Usuário</h1>
 
-<div class="teste-container">
+<div class="container-filho">
     <form action="{{ route('update.usuario', { usuario_id: usuario.id }) }}?_method=PUT" method="POST">
         {{ csrfField() }}
 

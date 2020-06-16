@@ -13,8 +13,8 @@ MaisVendas - Pedido: {{ pedido.id }}
 
 <h1>Pedido: {{ pedido.id }}</h1>
 
-<div class="teste-grid">
-    <div class="teste-container" style="width: 30%">
+<div class="container-pai">
+    <div class="container-filho" style="width: 30%">
         <form action="{{ route('update.pedido', { pedido_id: pedido.id }) }}?_method=PUT" method="POST">
             {{ csrfField() }}
 
@@ -91,56 +91,56 @@ MaisVendas - Pedido: {{ pedido.id }}
 
     <p></p>
 
-    <div class="teste-container" style="width: 60%">
+    <div class="container-filho" style="width: 60%">
         <!--<h4>Produtos do Pedido</h4>!-->
         <p><a id="btnAdicionarProduto" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="0" data-qtd="1" data-produtoid="" data-observacao="">Adicionar produto</a></p>
-        <table class="table table-sm table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-                <th>Produto</th>
-                <th>Observação</th>
-                <th class="text-center" style="width: 50px">Qtd.</th>
-                <th class="text-right" style="width: 130px">Preço Un. (R$)</th>
-                <th class="text-right" style="width: 100px">Total (R$)</th>
-                <th class="text-center" style="width: 100px">Ações</th>
-            </thead>
-        
-            @if(pedidoProdutos.length > 0)
-                <tbody>
-                    @each(pedidoProduto in pedidoProdutos)
-                        <tr>
-                            <td>{{ pedidoProduto.produto.nome }}</td>
-                            <td>{{ pedidoProduto.observacao != null ? pedidoProduto.observacao : '' }}</td>
-                            <td class="text-center">{{ pedidoProduto.quantidade }}</td>
-                            <td class="text-right">{{ pedidoProduto.precoUnitario }}</td>
-                            <td class="text-right">{{ pedidoProduto.quantidade * pedidoProduto.precoUnitario }}</td>
-                            <td class="text-center">
-                                <form action="{{ route('destroy.produto-pedido', { id: pedidoProduto.id }) }}?_method=DELETE" method="POST">
-                                    {{ csrfField() }}
-                                    
-                                    <a type="button" class="btn btn-primary btn-sm" data-placement="right" title="Alterar produto" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="{{ pedidoProduto.id }}" data-qtd="{{ pedidoProduto.quantidade }}" data-produtoid="{{ pedidoProduto.produto_id }}" data-observacao="{{ pedidoProduto.observacao }}">
-                                        <i class="fas fa-edit fa-sm"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-danger btn-sm classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
-                                        <i class="far fa-trash-alt fa-sm"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>                    
-                    @endeach
-                </tbody>
-            @endif
-        </table>
 
         @if(flashMessage('deleteProdutoPedidoError'))
-            <p></p>
-            <span>{{ flashMessage('deleteProdutoPedidoError') }}</span>
+            <p><span>{{ flashMessage('deleteProdutoPedidoError') }}</span></p>
         @endif
 
         @if(flashMessage('updateProdutoPedidoError'))
-            <p></p>
-            <span>{{ flashMessage('updateProdutoPedidoError') }}</span>
+            <p><span>{{ flashMessage('updateProdutoPedidoError') }}</span></p>
         @endif
 
+        <div class="table-scroll-pedido-produto">
+            <table class="table table-sm table-bordered table-hover table-striped">
+                <thead class="thead-dark">
+                    <th>Produto</th>
+                    <th>Observação</th>
+                    <th class="text-center" style="width: 50px">Qtd.</th>
+                    <th class="text-right" style="width: 130px">Preço Un. (R$)</th>
+                    <th class="text-right" style="width: 100px">Total (R$)</th>
+                    <th class="text-center" style="width: 100px">Ações</th>
+                </thead>
+            
+                @if(pedidoProdutos.length > 0)
+                    <tbody>
+                        @each(pedidoProduto in pedidoProdutos)
+                            <tr>
+                                <td>{{ pedidoProduto.produto.nome }}</td>
+                                <td>{{ pedidoProduto.observacao != null ? pedidoProduto.observacao : '' }}</td>
+                                <td class="text-center">{{ pedidoProduto.quantidade }}</td>
+                                <td class="text-right">{{ pedidoProduto.precoUnitario }}</td>
+                                <td class="text-right">{{ pedidoProduto.quantidade * pedidoProduto.precoUnitario }}</td>
+                                <td class="text-center">
+                                    <form action="{{ route('destroy.produto-pedido', { id: pedidoProduto.id }) }}?_method=DELETE" method="POST">
+                                        {{ csrfField() }}
+                                        
+                                        <a type="button" class="btn btn-primary btn-sm" data-placement="right" title="Alterar produto" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="{{ pedidoProduto.id }}" data-qtd="{{ pedidoProduto.quantidade }}" data-produtoid="{{ pedidoProduto.produto_id }}" data-observacao="{{ pedidoProduto.observacao }}">
+                                            <i class="fas fa-edit fa-sm"></i>
+                                        </a>
+                                        <button type="submit" class="btn btn-danger btn-sm classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
+                                            <i class="far fa-trash-alt fa-sm"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>                    
+                        @endeach
+                    </tbody>
+                @endif
+            </table>
+        </div>
     </div>
 </div>
 

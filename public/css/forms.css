@@ -1,9 +1,9 @@
-.teste-grid {
+.container-pai {
     display: flex;
     flex-wrap: wrap;
 }
 
-.teste-container {
+.container-filho {
     margin: 1em;
     
 
@@ -12,6 +12,18 @@
     width: 45%;
     border: 1px solid rgba(9, 50, 94, 100);
     border-radius: 5px;
+}
+
+.table-scroll {
+    width: 100%;
+    height: calc(100vh - 350px);
+    overflow: scroll;
+}
+
+.table-scroll-pedido-produto {
+    width: 100%;
+    height: calc(100vh - 650px);
+    overflow: scroll;
 }
 
 label {
