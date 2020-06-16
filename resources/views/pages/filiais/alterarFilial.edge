@@ -20,33 +20,25 @@ MaisVendas - Alterar Filial
         <label for="nome">Nome</label>
         <input class="form-control" type="text" name="nome" value="{{ old('nome', filial.nome) }}" maxlength="80">
         @if(hasErrorFor('nome'))
-            <span>
-                {{ getErrorFor('nome') }}
-            </span>
+            <span>{{ getErrorFor('nome') }}</span>
         @endif
 
         <label for="cnpj">CNPJ</label>
         <input class="form-control" type="text" name="cnpj" value="{{ old('cnpj', filial.cnpj) }}" maxlength="14">
         @if(hasErrorFor('cnpj'))
-            <span>
-                {{ getErrorFor('cnpj') }}
-            </span>
+            <span>{{ getErrorFor('cnpj') }}</span>
         @endif
 
         <label for="telefone">Telefone</label>
         <input class="form-control" type="text" name="telefone" value="{{ old('telefone', filial.telefone) }}" maxlength="14">
         @if(hasErrorFor('telefone'))
-            <span>
-                {{ getErrorFor('telefone') }}
-            </span>
+            <span>{{ getErrorFor('telefone') }}</span>
         @endif
 
         <label for="endereco">Endereço</label>
         <input class="form-control" type="text" name="endereco" value="{{ old('endereco', filial.endereco) }}" maxlength="200">
         @if(hasErrorFor('endereco'))
-            <span>
-                {{ getErrorFor('endereco') }}
-            </span>
+            <span>{{ getErrorFor('endereco') }}</span>
         @endif
 
         <button type="submit">Salvar</button>

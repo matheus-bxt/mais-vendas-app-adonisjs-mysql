@@ -22,46 +22,35 @@ MaisVendas - Cadastrar Produto
         <label for="codigo">Código</label>
         <input class="form-control" type="text" name="codigo" value="{{ old('codigo', '') }}" maxlength="10">
         @if(hasErrorFor('codigo'))
-            <span>
-                {{ getErrorFor('codigo') }}
-            </span>
+            <span>{{ getErrorFor('codigo') }}</span>
         @endif
 
         <label for="nome">Nome</label>
         <input class="form-control" type="text" name="nome" value="{{ old('nome', '') }}" maxlength="80">
         @if(hasErrorFor('nome'))
-            <span>
-                {{ getErrorFor('nome') }}
-            </span>
+            <span>{{ getErrorFor('nome') }}</span>
         @endif
 
         <label for="descricao">Descrição / Ingredientes</label>
         <textarea class="form-control" name="descricao" rows="8" maxlength="200">{{ old('descricao', '') }}</textarea>
         @if(hasErrorFor('descricao'))
-            <span>
-                {{ getErrorFor('descricao') }}
-            </span>
+            <span>{{ getErrorFor('descricao') }}</span>
         @endif
 
         <label for="custo">Custo (R$)</label>
         <input class="form-control" type="number" name="custo" value="{{ old('custo', '') }}" min="0.00" max="9999.99" step="0.01">
         @if(hasErrorFor('custo'))
-            <span>
-                {{ getErrorFor('custo') }}
-            </span>
+            <span>{{ getErrorFor('custo') }}</span>
         @endif
 
         <label for="precoVenda">Preço Venda (R$)</label>
         <input class="form-control" type="number" name="precoVenda" value="{{ old('precoVenda', '') }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('precoVenda'))
-            <span>
-                {{ getErrorFor('precoVenda') }}
-            </span>
+            <span>{{ getErrorFor('precoVenda') }}</span>
         @endif
 
         @if(flashMessage('storeProdutoError'))
-            <p></p>
-            <span>{{ flashMessage('storeProdutoError') }}</span>
+            <p><span>{{ flashMessage('storeProdutoError') }}</span></p>
         @endif
 
         <button type="submit">Salvar</button>

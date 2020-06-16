@@ -24,11 +24,15 @@ class CreateUser {
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',
-      'unique': '{{ field }} já existe',
-      'nome.max': '{{ field }} deve ter no máximo 80 caracteres',
-      'login.max': '{{ field }} deve ter no máximo 20 caracteres',
-      'password.max': '{{ field }} deve ter no máximo 20 caracteres',
+      'filial_id.required': 'Filial é um campo obrigatório',
+      'nome.required': 'Nome é um campo obrigatório',
+      'nome.max': 'Nome deve ter no máximo 80 caracteres',
+      'login.required': 'Login é um campo obrigatório',
+      'login.max': 'Login deve ter no máximo 20 caracteres',
+      'login.unique': 'Login já existe',
+      'password.required': 'Senha é um campo obrigatório',
+      'password.max': 'Senha deve ter no máximo 20 caracteres',
+      'confirmPassword.required': 'Confirmar Senha é um campo obrigatório',
       'confirmPassword.same': 'As senhas não conferem'
     }
   }

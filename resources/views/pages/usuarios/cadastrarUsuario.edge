@@ -35,41 +35,31 @@ MaisVendas - Cadastrar Usuário
             @endif
         </select>
         @if(hasErrorFor('filial_id'))
-            <span>
-                {{ getErrorFor('filial_id') }}
-            </span>
+            <span>{{ getErrorFor('filial_id') }}</span>
         @endif 
 
         <label for="nome">Nome</label>
         <input class="form-control" type="text" name="nome" value="{{ old('nome', '') }}" maxlength="80">
         @if(hasErrorFor('nome'))
-            <span>
-                {{ getErrorFor('nome') }}
-            </span>
+            <span>{{ getErrorFor('nome') }}</span>
         @endif
 
         <label for="login">Login</label>
         <input class="form-control" type="text" name="login" value="{{ old('login', '') }}" maxlength="20">
         @if(hasErrorFor('login'))
-            <span>
-                {{ getErrorFor('login') }}
-            </span>
+            <span>{{ getErrorFor('login') }}</span>
         @endif
 
         <label for="password">Senha</label>
         <input class="form-control" type="password" name="password" value="{{ old('password', '') }}" maxlength="20">
         @if(hasErrorFor('password'))
-            <span>
-                {{ getErrorFor('password') }}
-            </span>
+            <span>{{ getErrorFor('password') }}</span>
         @endif
 
         <label for="confirmPassword">Confirmar Senha</label>
         <input class="form-control" type="password" name="confirmPassword" value="{{ old('confirmPassword', '') }}" maxlength="20">
         @if(hasErrorFor('confirmPassword'))
-            <span>
-                {{ getErrorFor('confirmPassword') }}
-            </span>
+            <span>{{ getErrorFor('confirmPassword') }}</span>
         @endif
 
         @if(usuarios.length > 0)            
@@ -78,18 +68,15 @@ MaisVendas - Cadastrar Usuário
         @endif
 
         @if(flashMessage('storeFirstUserWithoutFilialError'))
-            <p></p>
-            <span>{{ flashMessage('storeFirstUserWithoutFilialError') }} <a href="/primeiraFilial">Clique aqui</a> para criar a primeira filial</span>
+            <p><span>{{ flashMessage('storeFirstUserWithoutFilialError') }} <a href="/primeiraFilial">Clique aqui</a> para criar a primeira filial</span></p>
         @endif
 
         @if(flashMessage('storeFirstUserAlreadyBeenCreatedError'))
-            <p></p>
-            <span>{{ flashMessage('storeFirstUserAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span>
+            <p><span>{{ flashMessage('storeFirstUserAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span></p>
         @endif
 
         @if(flashMessage('storeUserError'))
-            <p></p>
-            <span>{{ flashMessage('storeUserError') }}</span>
+            <p><span>{{ flashMessage('storeUserError') }}</span></p>
         @endif
 
         <button type="submit" onclick="teste()">Salvar</button>

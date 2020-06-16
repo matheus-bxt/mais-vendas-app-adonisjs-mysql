@@ -22,22 +22,17 @@ MaisVendas - Cadastrar Mesa
         <label for="numero">Número</label>
         <input class="form-control" type="number" name="numero" value="{{ old('numero', nextNumero) }}" min="1" max="999" step="1">
         @if(hasErrorFor('numero'))
-            <span>
-                {{ getErrorFor('numero') }}
-            </span>
+            <span>{{ getErrorFor('numero') }}</span>
         @endif
 
         <label for="nome">Nome</label>
         <input class="form-control" type="text" name="nome" value="{{ old('nome', '') }}" maxlength="80">
         @if(hasErrorFor('nome'))
-            <span>
-                {{ getErrorFor('nome') }}
-            </span>
+            <span>{{ getErrorFor('nome') }}</span>
         @endif
 
         @if(flashMessage('storeMesaError'))
-            <p></p>
-            <span>{{ flashMessage('storeMesaError') }}</span>
+            <p><span>{{ flashMessage('storeMesaError') }}</span></p>
         @endif
 
         <button type="submit">Salvar</button>

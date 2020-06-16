@@ -28,25 +28,19 @@ MaisVendas - Alterar Usuário
             @endeach
         </select>
         @if(hasErrorFor('filial_id'))
-            <span>
-                {{ getErrorFor('filial_id') }}
-            </span>
+            <span>{{ getErrorFor('filial_id') }}</span>
         @endif 
 
         <label for="nome">Nome</label>
         <input class="form-control" type="text" name="nome" value="{{ old('nome', usuario.nome) }}" maxlength="80">
         @if(hasErrorFor('nome'))
-            <span>
-                {{ getErrorFor('nome') }}
-            </span>
+            <span>{{ getErrorFor('nome') }}</span>
         @endif
 
         <label for="login">Login</label>
         <input class="form-control" type="text" name="login" value="{{ old('login', usuario.login) }}" maxlength="20">
         @if(hasErrorFor('login'))
-            <span>
-                {{ getErrorFor('login') }}
-            </span>
+            <span>{{ getErrorFor('login') }}</span>
         @endif
 
         <label for="alterarSenha">Alterar Senha?</label>
@@ -56,17 +50,13 @@ MaisVendas - Alterar Usuário
         <label {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="labelNovaSenha" for="password">Nova Senha</label>
         <input class="form-control" {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="inputNovaSenha" type="password" name="password" value="{{ old('password', '') }}" maxlength="20">
         @if(hasErrorFor('password'))
-            <span>
-                {{ getErrorFor('password') }}
-            </span>
+            <span>{{ getErrorFor('password') }}</span>
         @endif
 
         <label {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="labelConfirmarSenha" for="confirmPassword">Confirmar Senha</label>
         <input class="form-control" {{ old('alterarSenha') == 'on' ? '' : 'hidden' }} id="inputConfirmarSenha" type="password" name="confirmPassword" value="{{ old('confirmPassword', '') }}" maxlength="20">
         @if(hasErrorFor('confirmPassword'))
-            <span>
-                {{ getErrorFor('confirmPassword') }}
-            </span>
+            <span>{{ getErrorFor('confirmPassword') }}</span>
         @endif
 
         <label for="admin">Admin?</label>

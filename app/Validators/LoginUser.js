@@ -11,7 +11,9 @@ class CreateUser {
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório.',
+      'filial.required': 'Filial é um campo obrigatório.',
+      'login.required': 'Login é um campo obrigatório.',
+      'password.required': 'Senha é um campo obrigatório.'
     }
   }
 

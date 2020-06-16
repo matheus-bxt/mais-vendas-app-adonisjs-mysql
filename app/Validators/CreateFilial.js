@@ -14,13 +14,16 @@ class CreateFilial {
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',      
-      'nome.max': '{{ field }} deve ter no máximo 80 caracteres',
-      'cnpj.min': '{{ field }} deve ter 14 caracteres',
-      'cnpj.max': '{{ field }} deve ter 14 caracteres',      
-      'telefone.max': '{{ field }} deve ter no máximo 14 caracteres',
-      'endereco.max': '{{ field }} deve ter no máximo 200 caracteres',
-      'unique': '{{ field }} já existe'
+      'nome.required': 'Nome é um campo obrigatório',
+      'nome.max': 'Nome deve ter no máximo 80 caracteres',
+      'cnpj.required': 'CNPJ é um campo obrigatório',
+      'cnpj.min': 'CNPJ deve ter 14 caracteres',
+      'cnpj.max': 'CNPJ deve ter 14 caracteres',
+      'cnpj.unique': 'CNPJ já existe',
+      'telefone.required': 'Telefone é um campo obrigatório',
+      'telefone.max': 'Telefone deve ter no máximo 14 caracteres',
+      'endereco.required': 'Endereço é um campo obrigatório',
+      'endereco.max': 'Endereço deve ter no máximo 200 caracteres'
     }
   }
 

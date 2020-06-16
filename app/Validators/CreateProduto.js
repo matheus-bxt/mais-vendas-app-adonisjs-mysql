@@ -14,12 +14,15 @@ class CreateProduto {
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',
-      'codigo.max': '{{ field }} deve ter no máximo 10 caracteres',
-      'nome.max': '{{ field }} deve ter no máximo 80 caracteres',
-      'descricao.max': '{{ field }} deve ter no máximo 200 caracteres',
-      'custo.max': '{{ field }} deve ter no máximo 10 caracteres',
-      'precoVenda.max': '{{ field }} deve ter no máximo 10 caracteres'
+      'filial_id.required': 'Filial é um campo obrigatório',
+      'codigo.required': 'Código é um campo obrigatório',
+      'codigo.max': 'Código deve ter no máximo 10 caracteres',
+      'nome.required': 'Nome é um campo obrigatório',
+      'nome.max': 'Nome deve ter no máximo 80 caracteres',
+      'descricao.max': 'Descrição deve ter no máximo 200 caracteres',
+      'custo.max': 'Custo deve ter no máximo 10 caracteres',
+      'precoVenda.required': 'Preço Venda é um campo obrigatório',    
+      'precoVenda.max': 'Preço Venda deve ter no máximo 10 caracteres'
     }
   }
 

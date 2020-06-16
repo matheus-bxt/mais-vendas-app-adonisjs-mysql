@@ -31,9 +31,7 @@ MaisVendas - Cadastrar Pedido
         </select>
 
         @if(hasErrorFor('tipo_id'))
-            <span>
-                {{ getErrorFor('tipo_id') }}
-            </span>
+            <span>{{ getErrorFor('tipo_id') }}</span>
         @endif
 
         <div hidden id="divMesa">
@@ -45,9 +43,7 @@ MaisVendas - Cadastrar Pedido
                 @endeach
             </select>
             @if(hasErrorFor('mesa_id'))
-                <span>
-                    {{ getErrorFor('mesa_id') }}
-                </span>
+                <span>{{ getErrorFor('mesa_id') }}</span>
             @endif
             <span {{ mesas == null || mesas.length == 0 ? '' : 'hidden' }} id="spanMesa">Não existem mesas vazias</span>
         </div>
@@ -56,36 +52,28 @@ MaisVendas - Cadastrar Pedido
             <label for="enderecoEntrega">Endereço de Entrega</label>
             <input id="inputEnderecoEntrega" class="form-control" type="text" name="enderecoEntrega" value="{{ old('enderecoEntrega', '') }}" maxlength="200">
             @if(hasErrorFor('enderecoEntrega'))
-                <span id="spanEnderecoEntrega">
-                    {{ getErrorFor('enderecoEntrega') }}
-                </span>
+                <span id="spanEnderecoEntrega">{{ getErrorFor('enderecoEntrega') }}</span>
             @endif
         </div>
 
         <label for="observacao">Observação</label>
         <input id="inputObservacao" class="form-control" type="text" name="observacao" value="{{ old('observacao', '') }}" maxlength="200">
         @if(hasErrorFor('observacao'))
-            <span>
-                {{ getErrorFor('observacao') }}
-            </span>
+            <span>{{ getErrorFor('observacao') }}</span>
         @endif
 
         <label for="total">Total</label>
         <input readonly class="form-control" type="number" name="total" value="{{ old('total', '0') }}" min="0.01" max="9999.99" step="0.01">
         @if(hasErrorFor('total'))
-            <span>
-                {{ getErrorFor('total') }}
-            </span>
+            <span>{{ getErrorFor('total') }}</span>
         @endif
 
         @if(flashMessage('storePedidoError'))
-            <p></p>
-            <span>{{ flashMessage('storePedidoError') }}</span>
+            <p><span>{{ flashMessage('storePedidoError') }}</span></p>
         @endif
 
         @if(flashMessage('updateStatusMesaError'))
-            <p></p>
-            <span>{{ flashMessage('updateStatusMesaError') }}</span>
+            <p><span>{{ flashMessage('updateStatusMesaError') }}</span></p>
         @endif
 
         <button type="submit">Adicionar Produtos</button>

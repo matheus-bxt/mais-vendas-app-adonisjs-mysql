@@ -15,9 +15,11 @@ class CreateMesa {
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',
-      'nome.max': '{{ field }} deve ter no máximo 80 caracteres',
-      'numero.uniqueCombination': '{{ field }} já existe'
+      'filial_id.required': 'Filial é um campo obrigatório',
+      'numero.required': 'Número é um campo obrigatório',
+      'numero.uniqueCombination': 'Número já existe',
+      'nome.required': 'Nome é um campo obrigatório',
+      'nome.max': 'Nome deve ter no máximo 80 caracteres'
     }
   }
 

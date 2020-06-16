@@ -5,17 +5,18 @@ class CreateDespesa {
     return {
       'filial_id': 'required',
       'descricao': 'required|max:80',
-      'data': 'required|max:10',
-      'valor': 'required|max:10'
+      'data': 'required',
+      'valor': 'required'
     }
   }
 
   get messages() {
     return {
-      'required': '{{ field }} é um campo obrigatório',      
-      'descricao.max': '{{ field }} deve ter no máximo 80 caracteres',
-      'data.max': '{{ field }} deve ter no máximo 10 caracteres',
-      'valor.max': '{{ field }} deve ter no máximo 10 caracteres'
+      'filial_id.required': 'Filial é um campo obrigatório',
+      'descricao.required': 'Descrição é um campo obrigatório',
+      'descricao.max': 'Descrição deve ter no máximo 80 caracteres',
+      'data.required': 'Data é um campo obrigatório',
+      'valor.required': 'Valor é um campo obrigatório'
     }
   }
 

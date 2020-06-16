@@ -39,9 +39,7 @@
             @endif
         </div>
         @if(hasErrorFor('filial'))
-            <span>
-                {{ getErrorFor('filial') }}
-            </span>
+            <span>{{ getErrorFor('filial') }}</span>
         @endif
 
         <div class="input-group">
@@ -51,25 +49,20 @@
                     <a href="/primeiroUsuario" type="button" class="btn btn-success buttonPrimeiroLogin" data-toggle="tooltip" data-placement="right" title="Cadastrar primeiro usuário"><i class="fas fa-plus-square i-primeiroLogin"></i></a>
                 </div>
             @else
-                <input type="text" name="login" value="{{ old('login', '') }}" id="inputLogin" class="form-control" placeholder="Login">
+                <input type="text" name="login" value="{{ old('login', '') }}" id="inputLogin" class="form-control" placeholder="Login" maxlength="20">
             @endif
         </div>
         @if(hasErrorFor('login'))
-            <span>
-                {{ getErrorFor('login') }}
-            </span>
+            <span>{{ getErrorFor('login') }}</span>
         @endif
 
-        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Senha">
+        <input type="password" name="password" value="{{ old('password', '') }}" id="inputPassword" class="form-control" placeholder="Senha" maxlength="20">
         @if(hasErrorFor('password'))
-            <span>
-                {{ getErrorFor('password') }}
-            </span>
+            <span>{{ getErrorFor('password') }}</span>
         @endif
 
         @if(flashMessage('loginError'))
-            <p></p>
-            <span>{{ flashMessage('loginError') }}</span>
+            <p><span>{{ flashMessage('loginError') }}</span></p>
         @endif
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
