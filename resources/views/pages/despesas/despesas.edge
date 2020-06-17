@@ -32,8 +32,8 @@ MaisVendas - Despesas
     <table class="table table-bordered table-hover table-striped">
         <thead class="thead-dark">
             <th class="text-center" style="width: 100px">#</th>
-            <th>Descrição</th>
             <th class="text-center" style="width: 150px">Data</th>
+            <th>Descrição</th>
             <th class="text-right" style="width: 150px">Valor (R$)</th>
             <th class="text-center" style="width: 150px">Ações</th>
         </thead>
@@ -43,8 +43,8 @@ MaisVendas - Despesas
                 @each(despesa in despesas)
                     <tr>
                         <td class="text-center">{{ despesa.id }}</td>
-                        <td>{{ despesa.descricao }}</td>
                         <td class="text-center td-tipo-data">{{ despesa.data }}</td>
+                        <td>{{ despesa.descricao }}</td>
                         <td class="text-right">{{ despesa.valor }}</td>
                         <td class="text-center">
                             <form action="{{ route('destroy.despesa', { despesa_id: despesa.id }) }}?_method=DELETE" method="POST">

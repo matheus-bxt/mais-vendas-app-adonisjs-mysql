@@ -55,6 +55,7 @@ class DespesaController {
     const despesas = await Despesa
     .query()
     .where('filial_id', auth.user.filial_id)
+    .orderBy('data', 'desc')
     .fetch();
 
     return view.render('pages.despesas.despesas', { despesas: despesas.toJSON() });
