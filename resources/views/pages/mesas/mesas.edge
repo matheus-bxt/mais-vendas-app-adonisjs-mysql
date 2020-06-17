@@ -55,9 +55,9 @@ MaisVendas - Mesas
                         <td class="text-center">{{ mesa.status.nome }}</td>
                         <td class="text-center">
                             @if(mesa.status.id == 1)
-                                <a type="button" href="{{ route('view.cadastrarPedido', { mesaSelecionadaId: mesa.id }) }}" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="right">Cadastrar pedido</a>
+                                <a type="button" href="{{ route('view.cadastrarPedido', { mesaSelecionadaId: mesa.id }) }}" type="button" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="right">Cadastrar pedido</a>
                             @else
-                                <a type="button" href="{{ route('view.gerenciarPedido-mesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-warning" style="background-color: orange;" data-toggle="tooltip" data-placement="right">Gerenciar pedido</a>
+                                <a type="button" href="{{ route('view.gerenciarPedido-mesa', { mesa_id: mesa.id }) }}" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="right">Gerenciar pedido</a>
                             @endif
                         </td>
                         <td>{{ mesa.nome }}</td>

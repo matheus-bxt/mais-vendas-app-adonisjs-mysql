@@ -28,13 +28,17 @@ MaisVendas - Pedidos
     <p><span>{{ flashMessage('updatePedidoError') }}</span></p>
 @endif
 
+@if(flashMessage('updateStatusPedidoError'))
+    <p><span>{{ flashMessage('updateStatusPedidoError') }}</span></p>
+@endif
+
 <div class="table-scroll">
     <table class="table table-bordered table-hover table-striped">
         <thead class="thead-dark">
             <th class="text-center" style="width: 60px">#</th>
             <th class="text-center" style="width: 110px">Data</th>
             <th style="width: 180px">Tipo</th>
-            <th style="width: 180px">Status</th>
+            <th style="width: 150px">Status</th>
             <th class="text-center" style="width: 80px">Mesa</th>
             <th>Endereço Entrega</th>
             <th>Observação</th>
@@ -49,7 +53,16 @@ MaisVendas - Pedidos
                         <td class="text-center">{{ pedido.id }}</td>
                         <td class="text-center td-tipo-data">{{ pedido.data }}</td>
                         <td>{{ pedido.tipo.nome }}</td>
-                        <td>{{ pedido.status.nome }}</td>
+                        <td>
+                            <!-- 6 = Pago !-->
+                            @if(pedido.status_id == 6)
+                                <button disabled class="btn btn-secondary btn-sm classe-excluir">
+                            @else
+                                <button class="btn btn-primary btn-sm classe-excluir" data-placement="right" title="Alterar status" data-toggle="modal" data-target="#modalAlterarStatusPedido" data-pedidoid="{{ pedido.id }}" data-statusid="{{ pedido.status_id }}">
+                            @endif
+                                {{ pedido.status.nome }}
+                                </button>
+                        </td>
                         <td class="text-center">{{ pedido.mesa != null ? pedido.mesa.numero : '' }}</td>
                         <td>{{ pedido.enderecoEntrega != null ? pedido.enderecoEntrega : '' }}</td>
                         <td>{{ pedido.observacao != null ? pedido.observacao : '' }}</td>
@@ -58,8 +71,8 @@ MaisVendas - Pedidos
                             <form action="{{ route('destroy.pedido', { pedido_id: pedido.id }) }}?_method=DELETE" method="POST">
                                 {{ csrfField() }}
                                 
-                                <a type="button" href="{{ route('view.alterarPedido', { pedido_id: pedido.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Alterar pedido">
-                                    <i class="fas fa-edit fa-sm"></i>
+                                <a type="button" href="{{ route('view.alterarPedido', { pedido_id: pedido.id }) }}" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="{{ pedido.status_id == 6 ? 'Visualizar pedido' : 'Alterar pedido' }}">
+                                    <i class="{{ pedido.status_id == 6 ? 'far fa-eye fa-sm' : 'fas fa-edit fa-sm' }}"></i>
                                 </a>
                                 <button type="submit" class="btn btn-danger classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir pedido">
                                     <i class="far fa-trash-alt fa-sm"></i>
@@ -73,6 +86,35 @@ MaisVendas - Pedidos
     </table>
 </div>
 
+<!-- Modal Alterar Status Pedido -->
+<div class="modal fade" id="modalAlterarStatusPedido" tabindex="-1" role="dialog" aria-labelledby="modalAlterarStatusPedidoLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="formModalAlterarStatusPedido" action="" method="POST">
+                {{ csrfField() }}
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAlterarStatusPedidoLabel">Alterar Status do Pedido</h5>
+                </div>
+                <div class="modal-body">
+
+                    <label for="status_id">Status</label>
+                    <select id="selectStatusPedido" class="form-control" name="status_id" required>
+                        @each(status in statusPedidos)
+                            <option value="{{ status.id }}" {{ old('status_id') == status.id ? 'selected' : '' }}>{{ status.nome }}</option>
+                        @endeach
+                    </select>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary classe-excluir" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary classe-excluir">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
         $('.td-tipo-data').each(function(i) {
@@ -80,6 +122,18 @@ MaisVendas - Pedidos
             var split = data.split('-');
             $(this).text(split[2] + '/' + split[1] + '/' + split[0]);
         })
+    })
+
+    $('#modalAlterarStatusPedido').on('show.bs.modal', function (event) {
+        var modal = $(this);
+        var button = $(event.relatedTarget);
+
+        var pedido_id = button.data('pedidoid');
+        modal.find('#formModalAlterarStatusPedido').attr('action', '/api/alterarStatusPedido/' + pedido_id + '?_method=PUT');
+        modal.find('#modalAlterarStatusPedidoLabel').text('Alterar Status do Pedido: ' + pedido_id);
+
+        var status_id = button.data('statusid');
+        modal.find('#selectStatusPedido').val(status_id).change();
     })
 </script>
 

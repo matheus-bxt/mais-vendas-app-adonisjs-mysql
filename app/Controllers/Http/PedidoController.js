@@ -82,9 +82,12 @@ class PedidoController {
     .with('tipo')
     .with('status')
     .with('mesa')
+    .orderBy('id', 'desc')
     .fetch();
 
-    return view.render('pages.pedidos.pedidos', { pedidos: pedidos.toJSON() });
+    const statusPedidos = await StatusPedido.all();
+
+    return view.render('pages.pedidos.pedidos', { pedidos: pedidos.toJSON(), statusPedidos: statusPedidos.toJSON() });
   }
 
   async cadastrarPedidoView({ view, auth, params, session, response }) {
@@ -101,12 +104,13 @@ class PedidoController {
   async alterarPedidoView({ view, params, session, response, auth }) {
     var pedido = await Pedido.findBy('id', params.pedido_id);
     if (pedido == null) {
-      //retorna mensagem de erro para informar não foi encontrado o pedido com o id informado
-      session.flash({openToEditPedidoError: 'Não foi encontrado o pedido com o id informado!'})
-      return response.redirect('back');
+      //retorna mensagem de erro para informar que o pedido não existe mais
+      session.flash({openToEditPedidoError: 'O pedido não existe mais!'})
+      return response.redirect('/pedidos');
     }
 
     const tipos = await TipoPedido.all();
+    const statusPedidos = await StatusPedido.all();
 
     const mesaStatusVazia = 1;
     const mesas = await Mesa
@@ -128,15 +132,15 @@ class PedidoController {
     .where('filial_id', auth.user.filial_id)
     .fetch();
 
-    return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON(), tipos: tipos.toJSON(), mesas: mesas.toJSON(), pedidoProdutos: pedidoProdutos.toJSON(), produtos: produtos.toJSON() });
+    return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON(), tipos: tipos.toJSON(), statusPedidos: statusPedidos.toJSON(), mesas: mesas.toJSON(), pedidoProdutos: pedidoProdutos.toJSON(), produtos: produtos.toJSON() });
   }
 
   async gerenciarPedidoView({ view, params, session, response, auth }) {
     var mesa = await Mesa.findBy('id', params.mesa_id);
     if (mesa == null) {
-      //retorna mensagem de erro para informar não foi encontrada a mesa com o id informado
-      session.flash({gerenciarPedidoError: 'Não foi encontrada a mesa com o id informado!'})
-      return response.redirect('back');
+      //retorna mensagem de erro para informar que a mesa não existe mais
+      session.flash({gerenciarPedidoError: 'A mesa não existe mais!'})
+      return response.redirect('/mesas');
     }
 
     const pedidoStatusPago = 6;
@@ -152,7 +156,7 @@ class PedidoController {
       await mesa.save();
 
       session.flash({gerenciarPedidoError: 'Não foi encontrado nenhum pedido para esta mesa ou o pedido já foi pago!'})
-      return response.redirect('back');
+      return response.redirect('/mesas');
     }
 
     const pedido_id = pedido.rows[0].id;
@@ -167,6 +171,12 @@ class PedidoController {
       //retorna mensagem de erro para informar que o pedido não existe mais
       session.flash({updatePedidoError: 'O pedido não existe mais!'})
       return response.redirect('/pedidos');
+    }
+
+    const pedidoStatusPago = 6;
+    if (pedido.status_id == pedidoStatusPago) {
+      session.flash({storeProdutoPedidoError: 'Não é possível adicionar produtos em um pedido que já foi pago!'})
+      return response.redirect('back');
     }
 
     await PedidoProduto.create(dados);
@@ -218,8 +228,14 @@ class PedidoController {
       return response.redirect('/pedidos');
     }
 
+    const pedidoStatusPago = 6;
+    if (pedido.status_id == pedidoStatusPago) {
+      session.flash({updatePedidoError: 'Não é possível alterar um pedido que já foi pago!'})
+      return response.redirect('back');
+    }
+
     // Extrai os dados do request
-    const dados = request.only(['tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao']);
+    var dados = request.only(['tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'status_id']);
 
     const consumirNoLocal = 1;
     dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
@@ -235,6 +251,17 @@ class PedidoController {
       return response.redirect('back');
     }
 
+    dados.status_id = dados.status_id != null ? dados.status_id : pedido.status_id;
+
+    if (dados.status_id == pedidoStatusPago) {
+      var mesa = await Mesa.findBy('id', dados.mesa_id);      
+      if (mesa != null) {
+        const mesaStatusVazia = 1;
+        mesa.status_id = mesaStatusVazia;
+        await mesa.save();
+      }
+    }
+
     // Atualiza e salva o pedido
     pedido.merge(dados);
     await pedido.save();
@@ -245,7 +272,15 @@ class PedidoController {
   async updateProdutoPedido({ params, request, response, session }) {
     var pedidoProduto = await PedidoProduto.findBy('id', params.id);
     if (pedidoProduto == null) {
-      session.flash({updateProdutoPedidoError: 'O produto não existe mais.'});
+      session.flash({updateProdutoPedidoError: 'O produto não existe mais!'});
+      return response.redirect('back');
+    }
+
+    var pedido = await Pedido.findBy('id', pedidoProduto.pedido_id);
+
+    const pedidoStatusPago = 6;
+    if (pedido.status_id == pedidoStatusPago) {
+      session.flash({updateProdutoPedidoError: 'Não é possível alterar os produtos de um pedido que já foi pago!'})
       return response.redirect('back');
     }
 
@@ -254,7 +289,44 @@ class PedidoController {
     
     pedidoProduto.merge(dados);
     await pedidoProduto.save();
+
+    pedido.total = await this.calcularTotalPedido(pedido);
+    await pedido.save();
     
+    return response.redirect('back');
+  }
+
+  async updateStatusPedido({ params, request, response, session }) {
+    var pedido = await Pedido.findBy('id', params.pedido_id);
+    if (pedido == null) {
+      session.flash({updateStatusPedidoError: 'O pedido não existe mais!'});
+      return response.redirect('back');
+    }
+
+    const pedidoStatusPago = 6;
+    if (pedido.status_id == pedidoStatusPago) {
+      session.flash({updateStatusPedidoError: 'Não é possível alterar o status de um pedido que já foi pago!'});
+      return response.redirect('back');
+    }
+
+    const dados = request.only(['status_id']);
+
+    if (pedido.status_id == dados.status_id) {
+      return response.redirect('back');
+    }
+
+    pedido.status_id = dados.status_id;
+    await pedido.save();
+
+    if (pedido.status_id == pedidoStatusPago) {
+      var mesa = await Mesa.findBy('id', pedido.mesa_id);
+      if (mesa != null) {
+        const mesaStatusVazia = 1;
+        mesa.status_id = mesaStatusVazia;
+        await mesa.save();
+      }
+    }
+
     return response.redirect('back');
   }
 
@@ -322,13 +394,20 @@ class PedidoController {
   async destroyProdutoPedido ({ params, request, response, session }) {
     var pedidoProduto = await PedidoProduto.findBy('id', params.id);
     if (pedidoProduto == null) {
-      session.flash({deleteProdutoPedidoError: 'O produto não existe mais.'});
+      session.flash({deleteProdutoPedidoError: 'O produto não existe mais!'});
+      return response.redirect('back');
+    }
+
+    var pedido = await Pedido.findBy('id', pedidoProduto.pedido_id);
+
+    const pedidoStatusPago = 6;
+    if (pedido.status_id == pedidoStatusPago) {
+      session.flash({deleteProdutoPedidoError: 'Não é possível excluir os produtos de um pedido que já foi pago!'})
       return response.redirect('back');
     }
 
     await pedidoProduto.delete();
 
-    var pedido = await Pedido.findBy('id', pedidoProduto.pedido_id);
     pedido.total = await this.calcularTotalPedido(pedido);
     await pedido.save();
 

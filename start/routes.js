@@ -68,7 +68,8 @@ Route.group('userauth', () => {
         Route.put('/alterarProduto/:produto_id', 'ProdutoController.update').as('update.produto').prefix('api').validator('CreateProduto').middleware(['admin']);
         Route.put('/alterarMesa/:mesa_id', 'MesaController.update').as('update.mesa').prefix('api').validator('CreateMesa').middleware(['admin']);
         Route.put('/alterarPedido/:pedido_id', 'PedidoController.update').as('update.pedido').prefix('api').validator('CreatePedido');
-        Route.put('/alterarProdutoPedido/:id', 'PedidoController.updateProdutoPedido').as('update.produto-pedido').prefix('api')
+        Route.put('/alterarProdutoPedido/:id', 'PedidoController.updateProdutoPedido').as('update.produto-pedido').prefix('api');
+        Route.put('/alterarStatusPedido/:pedido_id', 'PedidoController.updateStatusPedido').as('update.status-pedido').prefix('api');
 
     //DELETE
         Route.delete('/excluirFilial/:filial_id', 'FilialController.destroy').as('destroy.filial').prefix('api').middleware(['admin']);

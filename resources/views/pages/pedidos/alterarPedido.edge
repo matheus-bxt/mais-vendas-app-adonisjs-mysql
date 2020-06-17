@@ -27,7 +27,6 @@ MaisVendas - Pedido: {{ pedido.id }}
                     <!--<option value="{{ tipo.id }}" {{ old('tipo_id') == tipo.id ? 'selected' : '' }}>{{ tipo.nome }}</option>!-->
                 @endeach
             </select>
-
             @if(hasErrorFor('tipo_id'))
                 <span>{{ getErrorFor('tipo_id') }}</span>
             @endif
@@ -59,6 +58,16 @@ MaisVendas - Pedido: {{ pedido.id }}
                 <span>{{ getErrorFor('observacao') }}</span>
             @endif
 
+            <label for="status_id">Status</label>
+            <select id="selectStatus" class="form-control" name="status_id" required>
+                @each(status in statusPedidos)
+                    <option {{ pedido.status_id == status.id ? 'selected' : '' }} value="{{ status.id }}" {{ old('status_id') == status.id ? 'selected' : '' }}>{{ status.nome }}</option>
+                @endeach
+            </select>
+            @if(hasErrorFor('status_id'))
+                <span>{{ getErrorFor('status_id') }}</span>
+            @endif
+
             <label for="total">Total</label>
             <input readonly class="form-control" type="number" name="total" value="{{ old('total', pedido.total) }}" min="0.01" max="9999.99" step="0.01">
             @if(hasErrorFor('total'))
@@ -66,11 +75,13 @@ MaisVendas - Pedido: {{ pedido.id }}
             @endif
 
             @if(flashMessage('updatePedidoError'))
-                <p><span>{{ flashMessage('updatePedidoError') }}</span></p>
+                <p></p>
+                <span>{{ flashMessage('updatePedidoError') }}</span>
             @endif
 
             @if(flashMessage('updateStatusMesaError'))
-                <p><span>{{ flashMessage('updateStatusMesaError') }}</span></p>
+                <p></p>
+                <span>{{ flashMessage('updateStatusMesaError') }}</span>
             @endif
 
             <button id="btnSalvar" type="submit">Salvar</button>
@@ -81,7 +92,11 @@ MaisVendas - Pedido: {{ pedido.id }}
 
     <div class="container-filho" style="width: 60%">
         <!--<h4>Produtos do Pedido</h4>!-->
-        <p><a id="btnAdicionarProduto" type="button" class="btn btn-success" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="0" data-qtd="1" data-produtoid="" data-observacao="">Adicionar produto</a></p>
+        <p><a id="btnAdicionarProduto" type="button" href="" class="btn btn-success" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="0" data-qtd="1" data-produtoid="" data-observacao="">Adicionar produto</a></p>
+
+        @if(flashMessage('storeProdutoPedidoError'))
+            <p><span>{{ flashMessage('storeProdutoPedidoError') }}</span></p>
+        @endif
 
         @if(flashMessage('deleteProdutoPedidoError'))
             <p><span>{{ flashMessage('deleteProdutoPedidoError') }}</span></p>
@@ -115,7 +130,7 @@ MaisVendas - Pedido: {{ pedido.id }}
                                     <form action="{{ route('destroy.produto-pedido', { id: pedidoProduto.id }) }}?_method=DELETE" method="POST">
                                         {{ csrfField() }}
                                         
-                                        <a type="button" class="btn btn-primary btn-sm" data-placement="right" title="Alterar produto" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="{{ pedidoProduto.id }}" data-qtd="{{ pedidoProduto.quantidade }}" data-produtoid="{{ pedidoProduto.produto_id }}" data-observacao="{{ pedidoProduto.observacao }}">
+                                        <a type="button" href="" class="btn btn-primary btn-sm" data-placement="right" title="Alterar produto" data-toggle="modal" data-target="#modalProdutoPedido" data-pedidoprodutoid="{{ pedidoProduto.id }}" data-qtd="{{ pedidoProduto.quantidade }}" data-produtoid="{{ pedidoProduto.produto_id }}" data-observacao="{{ pedidoProduto.observacao }}">
                                             <i class="fas fa-edit fa-sm"></i>
                                         </a>
                                         <button type="submit" class="btn btn-danger btn-sm classe-excluir" data-toggle="tooltip" data-placement="right" title="Excluir produto">
