@@ -69,11 +69,13 @@ MaisVendas - Cadastrar Pedido
         @endif
 
         @if(flashMessage('storePedidoError'))
-            <p><span>{{ flashMessage('storePedidoError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('storePedidoError') }}</span>
         @endif
 
         @if(flashMessage('updateStatusMesaError'))
-            <p><span>{{ flashMessage('updateStatusMesaError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('updateStatusMesaError') }}</span>
         @endif
 
         <button type="submit">Adicionar Produtos</button>

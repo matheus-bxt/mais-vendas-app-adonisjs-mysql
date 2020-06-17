@@ -68,15 +68,18 @@ MaisVendas - Cadastrar Usuário
         @endif
 
         @if(flashMessage('storeFirstUserWithoutFilialError'))
-            <p><span>{{ flashMessage('storeFirstUserWithoutFilialError') }} <a href="/primeiraFilial">Clique aqui</a> para criar a primeira filial</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeFirstUserWithoutFilialError') }} <a href="/primeiraFilial">Clique aqui</a> para criar a primeira filial</span>
         @endif
 
         @if(flashMessage('storeFirstUserAlreadyBeenCreatedError'))
-            <p><span>{{ flashMessage('storeFirstUserAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeFirstUserAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span>
         @endif
 
         @if(flashMessage('storeUserError'))
-            <p><span>{{ flashMessage('storeUserError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeUserError') }}</span>
         @endif
 
         <button type="submit" onclick="teste()">Salvar</button>

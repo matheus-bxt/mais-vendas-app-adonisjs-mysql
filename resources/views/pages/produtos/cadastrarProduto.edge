@@ -50,7 +50,8 @@ MaisVendas - Cadastrar Produto
         @endif
 
         @if(flashMessage('storeProdutoError'))
-            <p><span>{{ flashMessage('storeProdutoError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeProdutoError') }}</span>
         @endif
 
         <button type="submit">Salvar</button>

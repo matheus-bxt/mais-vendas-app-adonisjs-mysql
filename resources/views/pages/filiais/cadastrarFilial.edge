@@ -50,11 +50,13 @@ MaisVendas - Cadastrar Filial
         @endif
 
         @if(flashMessage('storeFirstFilialAlreadyBeenCreatedError'))
-            <p><span>{{ flashMessage('storeFirstFilialAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeFirstFilialAlreadyBeenCreatedError') }} <a href="/login">Clique aqui</a> para fazer o login</span>
         @endif
 
         @if(flashMessage('storeFilialError'))
-            <p><span>{{ flashMessage('storeFilialError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeFilialError') }}</span>
         @endif
 
         <button type="submit">Salvar</button>

@@ -32,7 +32,8 @@ MaisVendas - Alterar Mesa
         @endif
 
         @if(flashMessage('adminOnlyError'))
-            <p><span>{{ flashMessage('adminOnlyError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('adminOnlyError') }}</span>
         @endif
 
         <button type="submit">Salvar</button>

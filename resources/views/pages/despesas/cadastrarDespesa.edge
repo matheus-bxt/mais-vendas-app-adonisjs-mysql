@@ -38,7 +38,8 @@ MaisVendas - Cadastrar Despesa
         @endif
 
         @if(flashMessage('storeDespesaError'))
-            <p><span>{{ flashMessage('storeDespesaError') }}</span></p>
+            <p></p>
+            <span>{{ flashMessage('storeDespesaError') }}</span>
         @endif
 
         <button type="submit">Salvar</button>
