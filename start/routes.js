@@ -34,6 +34,7 @@ Route.group('userauth', () => {
         Route.get('/despesas', 'DespesaController.despesasView').as('view.despesas').middleware(['admin']);
         Route.get('/cadastrarDespesa', 'DespesaController.cadastrarDespesaView').as('view.cadastrarDespesa').middleware(['admin']);
         Route.get('/alterarDespesa/:despesa_id', 'DespesaController.alterarDespesaView').as('view.alterarDespesa').middleware(['admin']);
+        Route.get('/relatorioDespesas', 'DespesaController.relatorioDespesasView').as('view.relatorio-despesas').middleware(['admin']);;
 
         //PRODUTOS
         Route.get('/cardapio', 'ProdutoController.cardapioView').as('view.cardapio').middleware(['admin']);

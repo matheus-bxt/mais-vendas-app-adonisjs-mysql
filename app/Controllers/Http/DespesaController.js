@@ -147,6 +147,28 @@ class DespesaController {
 
     return response.redirect('/despesas');
   }
+
+  async relatorioDespesasView ({ request, auth, view }) {
+    const { data_inicial, data_final} = request.all();
+    
+    const despesas = await Despesa
+    .query()
+    .where('filial_id', auth.user.filial_id)
+    .andWhere('data', '>=', data_inicial)
+    .andWhere('data', '<=', data_final)
+    .fetch();
+
+    const valorTotalDespesas = despesas.toJSON().reduce((a, { valor }) => a + (valor), 0);
+    const dt_inicial = await this.formataData(data_inicial);
+    const dt_final = await this.formataData(data_final);
+
+    return view.render('pages.despesas.relatorioDespesas', { data_inicial: dt_inicial, data_final: dt_final, despesas: despesas.toJSON(), valorTotalDespesas: valorTotalDespesas })
+  }
+
+  async formataData(data) {
+    var split = data.split('-');
+    return split[2] + '/' + split[1] + '/' + split[0];
+  }
 }
 
 module.exports = DespesaController

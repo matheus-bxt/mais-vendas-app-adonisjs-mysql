@@ -14,7 +14,12 @@ MaisVendas - Despesas
 <img align="left" src="/img/expense-icon.png" width="80">
 <h1 style="padding: 15px 0 15px 100px">Despesas</h1>
 
-<p><a href="{{ route('view.cadastrarDespesa') }}" type="button" class="btn btn-success">Cadastrar nova despesa</a></p>
+<p>
+    <a href="{{ route('view.cadastrarDespesa') }}" type="button" class="btn btn-success">Cadastrar nova despesa</a>
+    <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de despesas" data-toggle="modal" data-target="#modalRelatorioDespesas">
+        <i class="fas fa-print"></i>
+    </a>
+</p>
 
 @if(flashMessage('openToEditDespesaError'))
     <p><span>{{ flashMessage('openToEditDespesaError') }}</span></p>
@@ -65,6 +70,34 @@ MaisVendas - Despesas
     </table>
 </div>
 
+<!-- Modal Relatório Despesas -->
+<div class="modal fade" id="modalRelatorioDespesas" tabindex="-1" role="dialog" aria-labelledby="modalRelatorioDespesasLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="formModalRelatorioDespesas" action="{{ route('view.relatorio-despesas') }}" method="GET" target="_blank">
+                {{ csrfField() }}
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalRelatorioDespesasLabel">Relatório de Despesas - Por Período</h5>
+                </div>
+                <div class="modal-body">
+
+                    <label for="data_inicial">Data Inicial</label>
+                    <input id="inputDataInicial" type="date" name="data_inicial" class="form-control" required>
+
+                    <label for="data_final">Data Final</label>
+                    <input id="inputDataFinal" type="date" name="data_final" class="form-control" required>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary classe-excluir" data-dismiss="modal">Cancelar</button>
+                    <button id="btnOkModalRelatorioDespesas" type="submit" class="btn btn-primary classe-excluir">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function() {
         $('.td-tipo-data').each(function(i) {
@@ -72,6 +105,20 @@ MaisVendas - Despesas
             var split = data.split('-');
             $(this).text(split[2] + '/' + split[1] + '/' + split[0]);
         })
+    })
+
+    $('#modalRelatorioDespesas').on('show.bs.modal', function (event) {
+        var split = new Date().toLocaleDateString().split('/');
+
+        var dataInicial = split[2] + '-' + split[1] + '-01';
+        $('#inputDataInicial').val(dataInicial);
+
+        var dataFinal = split[2] + '-' + split[1] + '-' + split[0];
+        $('#inputDataFinal').val(dataFinal);
+    })
+
+    $('#btnOkModalRelatorioDespesas').on('click', function() {
+        $('#modalRelatorioDespesas').modal('hide');
     })
 </script>
 

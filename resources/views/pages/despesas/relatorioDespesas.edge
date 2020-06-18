@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Relatório de Despesas</title>
+        <link rel="icon" href="/img/title-icon.png">
+
+        <!-- jQuery -->
+        {{ script('/js/jquery.js') }}
+
+        <!-- Estilos customizados para esse template -->
+        {{ style('/css/report.css') }}
+
+    </head>
+
+    <body>
+        <div class="container-report">
+            <h1 style="margin: 30px 30px" class="text-center">Relatório de Despesas</h1>
+            <h2>Período: {{ data_inicial }} à {{ data_final }}</h2>
+            <table>
+                <thead>
+                    <tr class="text-center">
+                        <th width="80px">Despesa</th>
+                        <th width="120px">Data</th>
+                        <th class="text-left">Descrição</th>
+                        <th width="120px" class="text-right">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @each(despesa in despesas)
+                        <tr class="text-center">
+                            <td>{{ despesa.id }}</td>
+                            <td class="td-tipo-data">{{ despesa.data }}</td>
+                            <td class="text-left">{{ despesa.descricao }}</td>
+                            <td class="text-right">R$ {{ despesa.valor }}</td>
+                        </tr>
+                        <tr style="height: 10px; background-color:gainsboro;">
+                            <td colspan="4"></td>
+                        </tr>
+                    @endeach
+                </tbody>
+            </table>
+
+            <br />
+            <br />
+            <p class="valor-total">Valor Total das Despesas: R$ {{ valorTotalDespesas > 0 ? valorTotalDespesas : 0 }}</p>
+            <br />
+        </div>
+        <div class="footer-report">
+            <hr>
+            <p></p>
+            <p></p>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function() {
+            $('.td-tipo-data').each(function(i) {
+                var data = $(this).text();
+                var split = data.split('-');
+                $(this).text(split[2] + '/' + split[1] + '/' + split[0]);
+            })
+        })
+    </script>
+</html>
