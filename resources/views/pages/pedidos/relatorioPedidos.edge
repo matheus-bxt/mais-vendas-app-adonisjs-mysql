@@ -19,7 +19,7 @@
             <table>
                 @each(pedido in pedidos)
                     <tbody>
-                        <tr>
+                        <tr class="text-center">
                             <th width="45px">Pedido</th>
                             <th width="75px">Data</th>
                             <th width="120px">Tipo</th>
@@ -41,7 +41,7 @@
                                 <td colspan="8"></td>
                             </tr>
 
-                            <tr>
+                            <tr class="text-center">
                                 <th colspan="3">Produtos</th>
                                 <th colspan="2">Observação</th>
                                 <th width="120px" class="text-right">Preço Unitário</th>
@@ -49,7 +49,7 @@
                                 <th width="130px" class="text-right">Total</th>
                             </tr>
                             @each(pedidoProduto in pedido.pedidoProdutos)
-                                <tr>
+                                <tr class="text-center">
                                     <td colspan="3">{{ pedidoProduto.produto.nome }}</td>
                                     <td colspan="2">{{ pedidoProduto.observacao != null ? pedidoProduto.observacao : '' }}</td>
                                     <td class="text-right">R$ {{ pedidoProduto.precoUnitario }}</td>
@@ -59,7 +59,7 @@
                             @endeach
 
                         </tr>
-                        <tr style="height: 60px;">
+                        <tr style="height: 60px; background-color:gainsboro;">
                             <td colspan="8"></td>
                         </tr>
                     </tbody>

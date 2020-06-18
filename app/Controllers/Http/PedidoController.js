@@ -369,13 +369,14 @@ class PedidoController {
     return response.redirect('back');
   }
 
-  async relatorioPedidosView({ params, request, response, view }) {
+  async relatorioPedidosView({ request, auth, view }) {
     const { data_inicial, data_final} = request.all();
     
     const pedidoStatusPago = 6;
     const pedidos = await Pedido
     .query()
-    .where('data', '>=', data_inicial)
+    .where('filial_id', auth.user.filial_id)
+    .andWhere('data', '>=', data_inicial)
     .andWhere('data', '<=', data_final)
     .andWhere('status_id', pedidoStatusPago)
     .with('tipo')
