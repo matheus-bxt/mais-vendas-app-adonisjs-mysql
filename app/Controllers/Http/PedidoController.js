@@ -6,6 +6,7 @@ const Mesa = use('App/Models/Mesa');
 const StatusPedido = use('App/Models/StatusPedido');
 const Produto = use('App/Models/Produto');
 const PedidoProduto = use('App/Models/PedidoProduto');
+const Database = use('Database');
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -60,7 +61,7 @@ class PedidoController {
     const statusPedidoNovo = await StatusPedido.findBy('id', 1);//1 - Novo
     dados.status_id = statusPedidoNovo.id;
 
-    var retorno = await this.atualizaStatusMesa(0, dados.mesa_id, session, response);
+    var retorno = await this.atualizaStatusMesa(0, dados.mesa_id, 0, dados.status_id, session);
     if (retorno == false) {
       return response.redirect('back');
     }
@@ -245,21 +246,12 @@ class PedidoController {
 
     dados.total = await this.calcularTotalPedido(pedido);
 
-    const mesaAnteriorId = pedido.mesa_id != null ? pedido.mesa_id : 0;
-    var retorno = await this.atualizaStatusMesa(mesaAnteriorId, dados.mesa_id, session);
-    if (retorno == false) {
-      return response.redirect('back');
-    }
-
     dados.status_id = dados.status_id != null ? dados.status_id : pedido.status_id;
 
-    if (dados.status_id == pedidoStatusPago) {
-      var mesa = await Mesa.findBy('id', dados.mesa_id);      
-      if (mesa != null) {
-        const mesaStatusVazia = 1;
-        mesa.status_id = mesaStatusVazia;
-        await mesa.save();
-      }
+    const mesaAnteriorId = pedido.mesa_id != null ? pedido.mesa_id : 0;
+    var retorno = await this.atualizaStatusMesa(mesaAnteriorId, dados.mesa_id, pedido.id, dados.status_id, session);
+    if (retorno == false) {
+      return response.redirect('back');
     }
 
     // Atualiza e salva o pedido
@@ -315,51 +307,12 @@ class PedidoController {
       return response.redirect('back');
     }
 
+    await this.atualizaStatusMesa(0, pedido.mesa_id, pedido.id, dados.status_id, session);
+
     pedido.status_id = dados.status_id;
     await pedido.save();
 
-    if (pedido.status_id == pedidoStatusPago) {
-      var mesa = await Mesa.findBy('id', pedido.mesa_id);
-      if (mesa != null) {
-        const mesaStatusVazia = 1;
-        mesa.status_id = mesaStatusVazia;
-        await mesa.save();
-      }
-    }
-
     return response.redirect('back');
-  }
-
-  async atualizaStatusMesa(mesaAnteriorId, mesaAtualId, session) {
-    if (mesaAnteriorId != mesaAtualId) {
-
-      if (mesaAtualId > 0) {
-        var mesaAtual = await Mesa.findBy('id', mesaAtualId);
-        if (mesaAtual == null) {
-          session.flash({updateStatusMesaError: 'A mesa selecionada não existe mais.'});
-          return false;
-        }
-
-        const statusOcupada = 2;
-
-        // if (mesa.status_id == statusOcupada) {
-        //   session.flash({storePedidoError: 'A mesa selecionada já está ocupada.'});
-        //   return response.redirect('back');
-        // }
-
-        mesaAtual.status_id = statusOcupada;
-        await mesaAtual.save();
-      }
-
-      var mesaAnterior = await Mesa.findBy('id', mesaAnteriorId);
-      if (mesaAnterior != null) {
-        const statusVazia = 1;
-        mesaAnterior.status_id = statusVazia;
-        await mesaAnterior.save();
-      }
-    }
-
-    return true;
   }
 
   /**
@@ -370,16 +323,18 @@ class PedidoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request, response, session }) {
     var pedido = await Pedido.findBy('id', params.pedido_id);
     if (pedido == null) {
-      //retorna mensagem de erro para informar não foi encontrado o pedido com o id informado
-      session.flash({deletePedidoError: 'Não foi encontrado o pedido com o id informado!'})
+      //retorna mensagem de erro para informar que o pedido não existe mais
+      session.flash({deletePedidoError: 'O pedido não existe mais!'})
       return response.redirect('back');
     }
+
+    const pedidoStatusPago = 6;
     
     var mesa = await Mesa.findBy('id', pedido.mesa_id);
-    if (mesa != null) {
+    if (mesa != null && pedido.status_id != pedidoStatusPago) {
       const statusVazia = 1;
       mesa.status_id = statusVazia;
       await mesa.save();
@@ -414,11 +369,78 @@ class PedidoController {
     return response.redirect('back');
   }
 
+  async relatorioPedidosView({ params, request, response, view }) {
+    const { data_inicial, data_final} = request.all();
+    
+    const pedidoStatusPago = 6;
+    const pedidos = await Pedido
+    .query()
+    .where('data', '>=', data_inicial)
+    .andWhere('data', '<=', data_final)
+    .andWhere('status_id', pedidoStatusPago)
+    .with('tipo')
+    .with('mesa')
+    .with('pedidoProdutos')
+    .with('pedidoProdutos.produto')
+    .fetch();
+
+    const valorTotalPedidos = pedidos.toJSON().reduce((a, { total }) => a + (total), 0);
+    const dt_inicial = await this.formataData(data_inicial);
+    const dt_final = await this.formataData(data_final);
+
+    return view.render('pages.pedidos.relatorioPedidos', { data_inicial: dt_inicial, data_final: dt_final, pedidos: pedidos.toJSON(), valorTotalPedidos: valorTotalPedidos })
+  }
+
+  async atualizaStatusMesa(mesaAnteriorId, mesaAtualId, pedidoId, pedidoStatusId, session) {
+    const pedidoStatusPago = 6;
+    const statusVazia = 1;
+    const statusOcupada = 2;
+
+    if (mesaAtualId > 0) {
+      var mesaAtual = await Mesa.findBy('id', mesaAtualId);
+      if (mesaAtual == null) {
+        session.flash({updateStatusMesaError: 'A mesa selecionada não existe mais.'});
+        return false;
+      }
+
+      var outrosPedidosNaoPagosComMesaAtual = await Pedido
+      .query()
+      .where('id', '<>', pedidoId)
+      .andWhere('status_id', '<>', pedidoStatusPago)
+      .andWhere('mesa_id', mesaAtualId)
+      .fetch();
+
+      if (outrosPedidosNaoPagosComMesaAtual.rows[0] != null) {
+        session.flash({updateStatusMesaError: 'A mesa selecionada já está ocupada.'});
+        return false;
+      }
+      
+      mesaAtual.status_id = pedidoStatusId == pedidoStatusPago ? statusVazia : statusOcupada;
+
+      await mesaAtual.save();
+    }
+
+    if (mesaAnteriorId != mesaAtualId) {
+      var mesaAnterior = await Mesa.findBy('id', mesaAnteriorId);
+      if (mesaAnterior != null) {
+        mesaAnterior.status_id = statusVazia;
+        await mesaAnterior.save();
+      }
+    }
+
+    return true;
+  }
+
   async calcularTotalPedido(pedido) {
     var pedidoProdutos = await pedido.pedidoProdutos().fetch();
     var total = pedidoProdutos.toJSON().reduce((a, { quantidade, precoUnitario }) => a + (quantidade * precoUnitario), 0);
 
     return total;
+  }
+
+  async formataData(data) {
+    var split = data.split('-');
+    return split[2] + '/' + split[1] + '/' + split[0];
   }
 }
 

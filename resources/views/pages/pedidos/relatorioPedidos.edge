@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Relatório de Pedidos</title>
+        <link rel="icon" href="/img/title-icon.png">
+
+        <!-- jQuery -->
+        {{ script('/js/jquery.js') }}
+
+        <!-- Estilos customizados para esse template -->
+        {{ style('/css/report.css') }}
+
+    </head>
+
+    <body>
+        <div class="container-report">
+            <h1 style="margin: 30px 30px" class="text-center">Relatório de Pedidos</h1>
+            <h2>Período: {{ data_inicial }} à {{ data_final }}</h2>
+            <table>
+                @each(pedido in pedidos)
+                    <tbody>
+                        <tr>
+                            <th width="45px">Pedido</th>
+                            <th width="75px">Data</th>
+                            <th width="120px">Tipo</th>
+                            <th width="40px">Mesa</th>
+                            <th>Endereço Entrega</th>
+                            <th colspan="2">Observação</th>
+                            <th width="100px" class="text-right">Total</th>
+                        </tr>
+                        <tr class="text-center">
+                            <td>{{ pedido.id }}</td>
+                            <td class="td-tipo-data">{{ pedido.data }}</td>
+                            <td>{{ pedido.tipo.nome }}</td>
+                            <td>{{ pedido.mesa.numero != null ? pedido.mesa.numero : '' }}</td>
+                            <td>{{ pedido.enderecoEntrega != null ? pedido.enderecoEntrega : '' }}</td>
+                            <td colspan="2">{{ pedido.observacao != null ? pedido.observacao : '' }}</td>
+                            <td class="text-right">R$ {{ pedido.total }}</td>
+                            
+                            <tr style="height:10px">
+                                <td colspan="8"></td>
+                            </tr>
+
+                            <tr>
+                                <th colspan="3">Produtos</th>
+                                <th colspan="2">Observação</th>
+                                <th width="120px" class="text-right">Preço Unitário</th>
+                                <th width="120px" class="text-right">Quantidade</th>
+                                <th width="130px" class="text-right">Total</th>
+                            </tr>
+                            @each(pedidoProduto in pedido.pedidoProdutos)
+                                <tr>
+                                    <td colspan="3">{{ pedidoProduto.produto.nome }}</td>
+                                    <td colspan="2">{{ pedidoProduto.observacao != null ? pedidoProduto.observacao : '' }}</td>
+                                    <td class="text-right">R$ {{ pedidoProduto.precoUnitario }}</td>
+                                    <td class="text-right">{{ pedidoProduto.quantidade }}</td>
+                                    <td class="text-right">R$ {{ pedidoProduto.precoUnitario * pedidoProduto.quantidade }}</td>
+                                </tr>
+                            @endeach
+
+                        </tr>
+                        <tr style="height: 60px;">
+                            <td colspan="8"></td>
+                        </tr>
+                    </tbody>
+                @endeach
+            </table>
+
+            <br />
+            <br />
+            <p class="valor-total">Valor Total dos Pedidos: R$ {{ valorTotalPedidos > 0 ? valorTotalPedidos : 0 }}</p>
+            <br />
+        </div>
+        <div class="footer-report">
+            <hr>
+            <p></p>
+            <p></p>
+        </div>
+    </body>
+    <script>
+        $(document).ready(function() {
+            $('.td-tipo-data').each(function(i) {
+                var data = $(this).text();
+                var split = data.split('-');
+                $(this).text(split[2] + '/' + split[1] + '/' + split[0]);
+            })
+        })
+    </script>
+</html>
