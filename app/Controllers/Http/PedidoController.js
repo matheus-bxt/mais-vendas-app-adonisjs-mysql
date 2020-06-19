@@ -6,77 +6,15 @@ const Mesa = use('App/Models/Mesa');
 const StatusPedido = use('App/Models/StatusPedido');
 const Produto = use('App/Models/Produto');
 const PedidoProduto = use('App/Models/PedidoProduto');
-const Database = use('Database');
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-/**
- * Resourceful controller for interacting with pedidos
- */
 class PedidoController {
-  /**
-   * Show a list of all pedidos.
-   * GET pedidos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
-  }
 
-  /**
-   * Render a form to be used for creating a new pedido.
-   * GET pedidos/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
-
-  /**
-   * Create/save a new pedido.
-   * POST pedidos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response, params, session, view }) {
-    // Extrai os dados do request
-    const dados = request.only(['filial_id', 'tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'total']);
-
-    const consumirNoLocal = 1;
-    dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
-
-    const delivery = 3;
-    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null;
-
-    const statusPedidoNovo = await StatusPedido.findBy('id', 1);//1 - Novo
-    dados.status_id = statusPedidoNovo.id;
-
-    var retorno = await this.atualizaStatusMesa(0, dados.mesa_id, 0, dados.status_id, session);
-    if (retorno == false) {
-      return response.redirect('back');
-    }
-
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    dados.data = today;
-
-    // Cria novo pedido com os dados do request
-    const novoPedido = await Pedido.create(dados);
-
-    return response.redirect(`/adicionarProdutos/pedido/${novoPedido.id}`, true);
-  }
-
-  async pedidosView({ view, auth }) {
+  //MÉTODOS GET
+  async pedidosView({ auth, view }) {
     const pedidos = await Pedido
     .query()
     .where('filial_id', auth.user.filial_id)
@@ -91,7 +29,7 @@ class PedidoController {
     return view.render('pages.pedidos.pedidos', { pedidos: pedidos.toJSON(), statusPedidos: statusPedidos.toJSON() });
   }
 
-  async cadastrarPedidoView({ view, auth, params, session, response }) {
+  async cadastrarPedidoView({ auth, view, params }) {
     const tipos = await TipoPedido.all();
     const mesas = await Mesa
     .query()
@@ -102,7 +40,7 @@ class PedidoController {
     return view.render('pages.pedidos.cadastrarPedido', { tipos: tipos.toJSON(), mesas: mesas.toJSON(), mesaSelecionadaId: params.mesaSelecionadaId });
   }
 
-  async alterarPedidoView({ view, params, session, response, auth }) {
+  async alterarPedidoView({ params, session, response, auth, view }) {
     var pedido = await Pedido.findBy('id', params.pedido_id);
     if (pedido == null) {
       //retorna mensagem de erro para informar que o pedido não existe mais
@@ -136,7 +74,7 @@ class PedidoController {
     return view.render('pages.pedidos.alterarPedido', { pedido: pedido.toJSON(), tipos: tipos.toJSON(), statusPedidos: statusPedidos.toJSON(), mesas: mesas.toJSON(), pedidoProdutos: pedidoProdutos.toJSON(), produtos: produtos.toJSON() });
   }
 
-  async gerenciarPedidoView({ view, params, session, response, auth }) {
+  async gerenciarPedidoView({ params, session, response }) {
     var mesa = await Mesa.findBy('id', params.mesa_id);
     if (mesa == null) {
       //retorna mensagem de erro para informar que a mesa não existe mais
@@ -164,7 +102,57 @@ class PedidoController {
     return response.redirect(`/alterarPedido/${pedido_id}`, true);
   }
 
-  async storeProdutoPedido({ request, view, params, session, response, auth }) {
+  async relatorioPedidosView({ request, auth, view }) {
+    const { data_inicial, data_final} = request.all();
+    
+    const pedidoStatusPago = 6;
+    const pedidos = await Pedido
+    .query()
+    .where('filial_id', auth.user.filial_id)
+    .andWhere('data', '>=', data_inicial)
+    .andWhere('data', '<=', data_final)
+    .andWhere('status_id', pedidoStatusPago)
+    .with('tipo')
+    .with('mesa')
+    .with('pedidoProdutos')
+    .with('pedidoProdutos.produto')
+    .fetch();
+
+    const valorTotalPedidos = pedidos.toJSON().reduce((a, { total }) => a + (total), 0);
+    const dt_inicial = await this.formataData(data_inicial);
+    const dt_final = await this.formataData(data_final);
+
+    return view.render('pages.pedidos.relatorioPedidos', { data_inicial: dt_inicial, data_final: dt_final, pedidos: pedidos.toJSON(), valorTotalPedidos: valorTotalPedidos })
+  }
+
+  //MÉTODOS POST
+  async store ({ request, response, session }) {
+    const dados = request.only(['filial_id', 'tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'total']);
+
+    const consumirNoLocal = 1;
+    dados.mesa_id = dados.tipo_id == consumirNoLocal ? dados.mesa_id : null;
+
+    const delivery = 3;
+    dados.enderecoEntrega = dados.tipo_id == delivery ? dados.enderecoEntrega : null;
+
+    const pedidoStatusNovo = 1;
+    dados.status_id = pedidoStatusNovo;
+
+    var retorno = await this.atualizaStatusMesa(0, dados.mesa_id, 0, dados.status_id, session);
+    if (retorno == false) {
+      return response.redirect('back');
+    }
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dados.data = today;
+    
+    const novoPedido = await Pedido.create(dados);
+
+    return response.redirect(`/adicionarProdutos/pedido/${novoPedido.id}`, true);
+  }
+  
+  async storeProdutoPedido({ request, session, response }) {
     const dados = request.only(['quantidade', 'precoUnitario', 'observacao', 'pedido_id', 'produto_id']);
 
     var pedido = await Pedido.findBy('id', dados.pedido_id);
@@ -172,6 +160,13 @@ class PedidoController {
       //retorna mensagem de erro para informar que o pedido não existe mais
       session.flash({updatePedidoError: 'O pedido não existe mais!'})
       return response.redirect('/pedidos');
+    }
+
+    var produto = await Produto.findBy('id', dados.produto_id);
+    if (produto == null) {
+      //retorna mensagem de erro para informar que o produto não existe mais
+      session.flash({storeProdutoPedidoError: 'O produto não existe mais!'})
+      return response.redirect('back');
     }
 
     const pedidoStatusPago = 6;
@@ -188,40 +183,8 @@ class PedidoController {
     return response.redirect('back');
   }
 
-  /**
-   * Display a single pedido.
-   * GET pedidos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing pedido.
-   * GET pedidos/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update pedido details.
-   * PUT or PATCH pedidos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response, session }) {
-    // Busca o pedido cadastrado com o parametro pedido_id
+  //MÉTODOS PUT
+  async update ({ params, session, response, request }) {
     const pedido = await Pedido.find(params.pedido_id);
     if (pedido == null) {
       //retorna mensagem de erro para informar que o pedido não existe mais
@@ -234,8 +197,7 @@ class PedidoController {
       session.flash({updatePedidoError: 'Não é possível alterar um pedido que já foi pago!'})
       return response.redirect('back');
     }
-
-    // Extrai os dados do request
+    
     var dados = request.only(['tipo_id', 'mesa_id', 'enderecoEntrega', 'observacao', 'status_id']);
 
     const consumirNoLocal = 1;
@@ -253,15 +215,14 @@ class PedidoController {
     if (retorno == false) {
       return response.redirect('back');
     }
-
-    // Atualiza e salva o pedido
+    
     pedido.merge(dados);
     await pedido.save();
     
     return response.redirect('/pedidos');
   }
 
-  async updateProdutoPedido({ params, request, response, session }) {
+  async updateProdutoPedido({ params, session, response, request }) {
     var pedidoProduto = await PedidoProduto.findBy('id', params.id);
     if (pedidoProduto == null) {
       session.flash({updateProdutoPedidoError: 'O produto não existe mais!'});
@@ -275,9 +236,15 @@ class PedidoController {
       session.flash({updateProdutoPedidoError: 'Não é possível alterar os produtos de um pedido que já foi pago!'})
       return response.redirect('back');
     }
-
-    // Extrai os dados do request
+    
     const dados = request.only(['produto_id', 'quantidade', 'precoUnitario', 'observacao']);
+
+    var produto = await Produto.findBy('id', dados.produto_id);
+    if (produto == null) {
+      //retorna mensagem de erro para informar que o produto não existe mais
+      session.flash({updateProdutoPedidoError: 'O produto não existe mais!'})
+      return response.redirect('back');
+    }
     
     pedidoProduto.merge(dados);
     await pedidoProduto.save();
@@ -288,7 +255,7 @@ class PedidoController {
     return response.redirect('back');
   }
 
-  async updateStatusPedido({ params, request, response, session }) {
+  async updateStatusPedido({ params, session, response, request }) {
     var pedido = await Pedido.findBy('id', params.pedido_id);
     if (pedido == null) {
       session.flash({updateStatusPedidoError: 'O pedido não existe mais!'});
@@ -315,15 +282,8 @@ class PedidoController {
     return response.redirect('back');
   }
 
-  /**
-   * Delete a pedido with id.
-   * DELETE pedidos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response, session }) {
+  //MÉTODOS DELETE
+  async destroy ({ params, session, response }) {
     var pedido = await Pedido.findBy('id', params.pedido_id);
     if (pedido == null) {
       //retorna mensagem de erro para informar que o pedido não existe mais
@@ -346,7 +306,7 @@ class PedidoController {
     return response.redirect('/pedidos');
   }
 
-  async destroyProdutoPedido ({ params, request, response, session }) {
+  async destroyProdutoPedido ({ params, session, response }) {
     var pedidoProduto = await PedidoProduto.findBy('id', params.id);
     if (pedidoProduto == null) {
       session.flash({deleteProdutoPedidoError: 'O produto não existe mais!'});
@@ -369,29 +329,7 @@ class PedidoController {
     return response.redirect('back');
   }
 
-  async relatorioPedidosView({ request, auth, view }) {
-    const { data_inicial, data_final} = request.all();
-    
-    const pedidoStatusPago = 6;
-    const pedidos = await Pedido
-    .query()
-    .where('filial_id', auth.user.filial_id)
-    .andWhere('data', '>=', data_inicial)
-    .andWhere('data', '<=', data_final)
-    .andWhere('status_id', pedidoStatusPago)
-    .with('tipo')
-    .with('mesa')
-    .with('pedidoProdutos')
-    .with('pedidoProdutos.produto')
-    .fetch();
-
-    const valorTotalPedidos = pedidos.toJSON().reduce((a, { total }) => a + (total), 0);
-    const dt_inicial = await this.formataData(data_inicial);
-    const dt_final = await this.formataData(data_final);
-
-    return view.render('pages.pedidos.relatorioPedidos', { data_inicial: dt_inicial, data_final: dt_final, pedidos: pedidos.toJSON(), valorTotalPedidos: valorTotalPedidos })
-  }
-
+  //OUTROS MÉTODOS
   async atualizaStatusMesa(mesaAnteriorId, mesaAtualId, pedidoId, pedidoStatusId, session) {
     const pedidoStatusPago = 6;
     const statusVazia = 1;
