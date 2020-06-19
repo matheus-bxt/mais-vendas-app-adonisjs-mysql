@@ -13,7 +13,7 @@ class Admin {
     // call next to advance the request
     if(!auth.user.admin){
       session.flash({adminOnlyError: 'Acesso negado! Somente usuário administrador.'})
-      return response.redirect('back')
+      return response.redirect('/')
     }
 
     await next()

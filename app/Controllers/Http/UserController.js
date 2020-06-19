@@ -7,71 +7,71 @@ const Filial = use('App/Models/Filial');
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-/**
- * Resourceful controller for interacting with users
- */
 class UserController {
-  /**
-   * Show a list of all users.
-   * GET users
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+  
+  //MÉTODOS GET
+  async loginView({ view }) {
+    const usuarios = await User.all();
+    const filiais = await Filial.all();
+
+    return view.render('auth.login', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
   }
 
-  /**
-   * Render a form to be used for creating a new user.
-   * GET users/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async usuariosView({ view }) {
+    const usuarios = await User
+    .query()
+    .with('filial')
+    .fetch();
+
+    return view.render('pages.usuarios.usuarios', { usuarios: usuarios.toJSON() });
   }
 
-  /**
-   * Create/save a new user.
-   * POST users
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, auth, response, session }) {
-    const users = await User.all();
-    // Caso ainda não exista nenhum usuário, redireciona para a rota /primeiroUsuario para cadastrar o primeiro usuário
-    if (users.rows.length == 0) {
-      return response.redirect('/primeiroUsuario');
+  async cadastrarUsuarioView({ view }) {
+    const usuarios = await User.all();
+    const filiais = await Filial.all();
+
+    return view.render('pages.usuarios.cadastrarUsuario', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
+  }
+
+  async alterarUsuarioView({ params, session, response, view }) {
+    var usuario = await User.findBy('id', params.usuario_id);
+    if (usuario == null) {
+      //retorna mensagem de erro para informar que o usuário não existe mais
+      session.flash({openToEditUsuarioError: 'O usuário não existe mais!'});
+      return response.redirect('/usuarios');
     }
 
-    // Extrai os dados do request
-    const data = request.only(['nome', 'login', 'password', 'admin', 'filial_id']);
-    data.admin = data.admin == 'on' ? true : false;
-    data.filial_id = data.filial_id == null ? auth.user.filial_id : data.filial_id;
+    const filiais = await Filial.all();
 
-    // Verifica se já existe um usuario com o login informado
-    var user = await User.findBy('login', data.login);
-    if (user != null) {
+    return view.render('pages.usuarios.alterarUsuario', { usuario: usuario.toJSON(), filiais: filiais.toJSON() });
+  }
+
+  //MÉTODOS POST
+  async store ({ response, request, auth, session }) {
+    const usuarios = await User.all();
+    if (usuarios.rows.length == 0) {
+      return response.redirect('/primeiroUsuario');
+    }
+    
+    const dados = request.only(['nome', 'login', 'password', 'admin', 'filial_id']);
+    dados.admin = dados.admin == 'on' ? true : false;
+    dados.filial_id = dados.filial_id == null ? auth.user.filial_id : dados.filial_id;
+
+    var usuario = await User.findBy('login', dados.login);
+    if (usuario != null) {
       // Retorna mensagem para informar que já existe um usuario com o login informado
       session.flash({storeUserError: 'Já existe um usuário com o login informado!'});
       return response.redirect('/cadastrarUsuario');
     }
+    
+    await User.create(dados);
 
-    // Cria novo usuário com os dados do request
-    await User.create(data);
     return response.redirect('/usuarios');
   }
 
-  async storeFirst ({ request, response, session }) {
-    // Busca todos os usuarios cadastrados
-    const users = await User.all();
-    if (users.rows.length == 0) {
+  async storeFirst ({ session, response, request }) {
+    const usuarios = await User.all();
+    if (usuarios.rows.length == 0) {
 
       const filiais = await Filial.all();
       if (filiais.rows.length == 0) {
@@ -79,14 +79,12 @@ class UserController {
         session.flash({storeFirstUserWithoutFilialError: 'Antes de criar o primeiro usuário do sistema, deve ser criada a primeira filial!'});
         return response.redirect('/primeiroUsuario');
       }
-
-      // Extrai os dados do request
-      const data = request.only(['nome', 'login', 'password', 'admin', 'filial_id']);
-      data.admin = true;
-      data.filial_id = data.filial_id == null ? filiais.rows[0].id : data.filial_id;
-
-      // Cria novo usuario com os dados do request
-      await User.create(data);
+      
+      const dados = request.only(['nome', 'login', 'password', 'admin', 'filial_id']);
+      dados.admin = true;
+      dados.filial_id = dados.filial_id == null ? filiais.rows[0].id : dados.filial_id;
+      
+      await User.create(dados);
     } else {
       // Retorna mensagem para informar que o primeiro usuário do sistema já foi criado
       session.flash({storeFirstUserAlreadyBeenCreatedError: 'O primeiro usuário do sistema já foi criado! Para criar novos usuários, faça o login com um usuário administrador.'});
@@ -96,12 +94,10 @@ class UserController {
     return response.redirect('/');
   }
 
-  async login({ request, auth, response, session }) {
+  async login({ request, session, response, auth }) {
     const { login, password, filial } = request.all();
     
-    // Verifica se existe um usuário com o login informado e se o usuário pertence a filial informada
     var usuario = await User.findBy('login', login);
-
     if (usuario != null && usuario.filial_id != filial) {
       session.flash({loginError: 'Usuário não pertence a filial informada!'});
       return response.redirect('/login');
@@ -116,95 +112,8 @@ class UserController {
     }
   }
 
-  async loginView({ view }) {
-    const usuarios = await User.all();
-    const filiais = await Filial.all();
-    return view.render('auth.login', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
-  }
-
-  async usuariosView({ view }) {
-    const usuarios = await User
-    .query()
-    .with('filial')
-    .fetch();
-
-    const filiais = await Filial.all();
-    return view.render('pages.usuarios.usuarios', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
-  }
-
-  async cadastrarUsuarioView({ view }) {
-    const usuarios = await User.all();
-    const filiais = await Filial.all();
-    return view.render('pages.usuarios.cadastrarUsuario', { usuarios: usuarios.toJSON(), filiais: filiais.toJSON() });
-  }
-
-  async alterarUsuarioView({ view, params, session, response }) {
-    var usuario = await User.findBy('id', params.usuario_id);
-    if (usuario == null) {
-      //retorna mensagem de erro para informar não foi encontrado o usuário com o id informado
-      session.flash({openToEditUsuarioError: 'Não foi encontrado o usuário com o id informado!'});
-      return response.redirect('back');
-    }
-
-    const filiais = await Filial.all();
-
-    return view.render('pages.usuarios.alterarUsuario', { usuario: usuario.toJSON(), filiais: filiais.toJSON() });
-  }
-
-  /**
-   * Display a single user.
-   * GET users/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-    // Busca o usuario cadastrado com o parametro id
-    const user = await User.find(params.id);
-
-    // Verifica se o usuario existe
-    if(user == null) {
-      // Retorna mensagem no response para informar que o usuario informado não existe
-      response.status(404).send({error:{ message: 'Usuário informado não existe!' }});
-      return response;
-    }
-
-    // Retorna o usuario cadastrado
-    return user;
-  }
-
-  async showAll ({ request, response, view }) {
-    // Busca todos os usuarios cadastrados
-    const users = await User.all();
-
-    // Retorna todos os usuarios cadastrados em formato json
-    return users.toJSON();
-  }
-
-  /**
-   * Render a form to update an existing user.
-   * GET users/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update user details.
-   * PUT or PATCH users/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response, session }) {
-    // Busca usuário cadastrado com o parametro usuario_id
+  //MÉTODOS PUT
+  async update ({ params, session, response, request }) {
     const usuario = await User.find(params.usuario_id);
     if (usuario == null) {
       //retorna mensagem de erro para informar que o usuário não existe mais
@@ -214,40 +123,31 @@ class UserController {
 
     var { alterarSenha } = request.all();
     if(alterarSenha == 'on') {
-      // Extrai os dados do request
-      var data = request.only(['filial_id', 'nome', 'login', 'password', 'admin']);
+      var dados = request.only(['filial_id', 'nome', 'login', 'password', 'admin']);
     } else {
-      var data = request.only(['filial_id', 'nome', 'login', 'admin']);
+      var dados = request.only(['filial_id', 'nome', 'login', 'admin']);
     }
 
-    data.admin = data.admin == 'on' ? true : false;
-
-    // Atualiza e salva o usuário
-    usuario.merge(data);
+    dados.admin = dados.admin == 'on' ? true : false;
+    
+    usuario.merge(dados);
     await usuario.save();
     
     return response.redirect('/usuarios');
   }
 
-  /**
-   * Delete a user with id.
-   * DELETE users/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response, session, auth }) {
+  //MÉTODOS DELETE
+  async destroy ({ params, session, response, auth }) {
     var usuario = await User.findBy('id', params.usuario_id);
     if (usuario == null) {
-      //retorna mensagem de erro para informar não foi encontrado o usuário com o id informado
-      session.flash({deleteUsuarioError: 'Não foi encontrado o usuário com o id informado!'});
-      return response.redirect('back');
+      //retorna mensagem de erro para informar que o usuário não existe mais
+      session.flash({deleteUsuarioError: 'O usuário não existe mais!'});
+      return response.redirect('/usuarios');
     }
 
     if (usuario.id == auth.user.id) {
-      session.flash({deleteUsuarioError: `Não é possível excluir o usuário: ${usuario.id} - ${usuario.nome}, pois você está logado nele!`});
-      return response.redirect('back');
+      session.flash({deleteUsuarioError: `Não é possível excluir o usuário: ${usuario.login} - ${usuario.nome}, pois você está logado nele!`});
+      return response.redirect('/usuarios');
     }
 
     await usuario.delete();
