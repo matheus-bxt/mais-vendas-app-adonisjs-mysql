@@ -16,6 +16,7 @@ class MesaController {
     .query()
     .where('filial_id', auth.user.filial_id)
     .with('status')
+    .orderBy('numero', 'asc')
     .fetch();
 
     return view.render('pages.mesas.mesas', { mesas: mesas.toJSON() });

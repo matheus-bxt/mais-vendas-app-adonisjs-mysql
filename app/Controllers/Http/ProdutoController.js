@@ -1,61 +1,20 @@
 'use strict'
 
 const Produto = use('App/Models/Produto');
+const PedidoProduto = use('App/Models/PedidoProduto');
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-/**
- * Resourceful controller for interacting with produtos
- */
 class ProdutoController {
-  /**
-   * Show a list of all produtos.
-   * GET produtos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new produto.
-   * GET produtos/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
-
-  /**
-   * Create/save a new produto.
-   * POST produtos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
-    // Extrai os dados do request
-    const data = request.only(['filial_id', 'codigo', 'nome', 'descricao', 'custo', 'precoVenda']);
-    data.custo = data.custo != null ? data.custo : 0;
-
-    // Cria novo produto com os dados do request
-    await Produto.create(data);    
-    return response.redirect('/cardapio');
-  }
-
-  async cardapioView({ view, auth }) {
+  
+  //MÉTODOS GET
+  async cardapioView({ auth, view }) {
     const produtos = await Produto
     .query()
     .where('filial_id', auth.user.filial_id)
+    .orderBy('nome', 'asc')
     .fetch();
 
     return view.render('pages.produtos.cardapio', { produtos: produtos.toJSON() });
@@ -65,86 +24,65 @@ class ProdutoController {
     return view.render('pages.produtos.cadastrarProduto');
   }
 
-  async alterarProdutoView({ view, params, session, response }) {
+  async alterarProdutoView({ params, session, response, view }) {
     var produto = await Produto.findBy('id', params.produto_id);
     if (produto == null) {
-      //retorna mensagem de erro para informar não foi encontrado o produto com o id informado
-      session.flash({openToEditProdutoError: 'Não foi encontrado o produto com o id informado!'})
-      return response.redirect('back');
+      //retorna mensagem de erro para informar que o produto não existe mais
+      session.flash({openToEditProdutoError: 'O produto não existe mais!'})
+      return response.redirect('/cardapio');
     }
 
     return view.render('pages.produtos.alterarProduto', { produto: produto.toJSON() });
   }
 
-  /**
-   * Display a single produto.
-   * GET produtos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
+  //MÉTODOS POST
+  async store ({ request, response }) {
+    const dados = request.only(['filial_id', 'codigo', 'nome', 'descricao', 'custo', 'precoVenda']);
+    dados.custo = dados.custo != null ? dados.custo : 0;
+    
+    await Produto.create(dados);
+    
+    return response.redirect('/cardapio');
   }
 
-  /**
-   * Render a form to update an existing produto.
-   * GET produtos/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update produto details.
-   * PUT or PATCH produtos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response, session }) {
-    // Busca o produto cadastrado com o parametro produto_id
+  //MÉTODOS PUT
+  async update ({ params, session, response, request }) {
     const produto = await Produto.find(params.produto_id);
     if (produto == null) {
       //retorna mensagem de erro para informar que o produto não existe mais
       session.flash({updateProdutoError: 'O produto não existe mais!'})
       return response.redirect('/cardapio');
     }
-
-    // Extrai os dados do request
-    const data = request.only(['codigo', 'nome', 'descricao', 'custo', 'precoVenda']);
     
-    // Atualiza e salva o produto
-    produto.merge(data);
+    const dados = request.only(['codigo', 'nome', 'descricao', 'custo', 'precoVenda']);
+    
+    produto.merge(dados);
     await produto.save();
     
     return response.redirect('/cardapio');
   }
 
-  /**
-   * Delete a produto with id.
-   * DELETE produtos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response, session }) {
+  //MÉTODOS DELETE
+  async destroy ({ params, session, response }) {
     var produto = await Produto.findBy('id', params.produto_id);
     if (produto == null) {
-      //retorna mensagem de erro para informar não foi encontrado o produto com o id informado
-      session.flash({deleteProdutoError: 'Não foi encontrado o produto com o id informado!'});
-      return response.redirect('back');
+      //retorna mensagem de erro para informar que o produto não existe mais
+      session.flash({deleteProdutoError: 'O produto não existe mais!'});
+      return response.redirect('/cardapio');
     }
+    
+    const pedidosComEsteProduto = await PedidoProduto
+    .query()
+    .where('produto_id', produto.id)
+    .fetch();
 
+    if (pedidosComEsteProduto.rows.length > 0) {
+      session.flash({deleteProdutoError: `Não é possível excluir o produto: ${produto.codigo} - ${produto.nome} pois existem pedidos com este produto!`});
+      return response.redirect('/cardapio');
+    }
+    
     await produto.delete();
-
+    
     return response.redirect('/cardapio');
   }
 }
