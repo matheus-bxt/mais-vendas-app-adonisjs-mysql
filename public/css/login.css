@@ -52,3 +52,17 @@ span {
   padding: .3em;
   margin-bottom: 20px;
 }
+
+button:not(.classe-excluir) {
+  padding: .5em !important;
+  background: rgba(9, 50, 94, 100);
+  border: 0;
+  color: white;
+  /* font-size: 1.2em; */
+  /* font-family: 'Montserrat'; */
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-top: 40px;
+  cursor: pointer;
+}
