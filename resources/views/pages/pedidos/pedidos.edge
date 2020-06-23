@@ -18,7 +18,14 @@ MaisVendas - Pedidos
     <a href="{{ route('view.cadastrarPedido') }}" type="button" class="btn btn-success">Cadastrar novo pedido</a>
     <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de pedidos" data-toggle="modal" data-target="#modalRelatorioPedidos">
         <i class="fas fa-print"></i>
-    </a>
+    </a>   
+    <select id="selectFiltroStatus" onchange="filtrarPedidoPorStatus()" class="form-control" style="width:180px; float:right;" data-placement="right" title="Filtrar pedidos por status">
+        <option value="0" selected>Todos</option>
+        @each(status in statusPedidos)
+            <option value="{{ status.id }}">{{ status.nome }}</option>          
+        @endeach
+    </select>
+    <label style="margin-right:10px; float:right;" for="selectFiltroStatus">Filtrar pedidos</label>
 </p>
 
 @if(flashMessage('openToEditPedidoError'))
@@ -38,7 +45,7 @@ MaisVendas - Pedidos
 @endif
 
 <div class="table-scroll">
-    <table class="table table-bordered table-hover table-striped">
+    <table class="table table-bordered table-hover table-striped" id="tablePedidos">
         <thead class="thead-dark">
             <th class="text-center" style="width: 60px">#</th>
             <th class="text-center" style="width: 110px">Data</th>
@@ -58,7 +65,7 @@ MaisVendas - Pedidos
                         <td class="text-center">{{ pedido.id }}</td>
                         <td class="text-center td-tipo-data">{{ pedido.data }}</td>
                         <td>{{ pedido.tipo.nome }}</td>
-                        <td>
+                        <td class="td-status" data-pedidostatusid="{{ pedido.status_id }}">
                             <!-- 6 = Pago !-->
                             @if(pedido.status_id == 6)
                                 <button disabled class="btn btn-secondary btn-sm classe-excluir">
@@ -182,6 +189,26 @@ MaisVendas - Pedidos
     $('#btnOkModalRelatorioPedidos').on('click', function() {
         $('#modalRelatorioPedidos').modal('hide');
     })
+
+    function filtrarPedidoPorStatus() {
+        var statusFiltrado = $('#selectFiltroStatus').find(':selected').val();
+        var statusTodos = 0;
+
+        $('#tablePedidos > tbody > tr').each(function() {
+            var rowPedido = this;
+
+            var celStatus = rowPedido.getElementsByClassName("td-status")[0];
+            if (celStatus != null) {
+                
+                var statusId = $(celStatus).data('pedidostatusid');
+                if (statusFiltrado == statusTodos || statusId == statusFiltrado) {
+                    rowPedido.style.display = "";
+                } else {
+                    rowPedido.style.display = "none";
+                }
+            }
+        })
+    }
 </script>
 
 @endsection
