@@ -1,0 +1,11 @@
+#pBemVindo {
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+    color: rgba(9, 50, 94, 100);
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    /* margin-right: -50%; */
+    transform: translate(-50%, -50%)
+}

@@ -1,14 +1,20 @@
 @layout('layouts.main')
 
+@section('extracss')
+<!-- Estilos customizados para esse template -->
+{{ style('/css/inicio.css') }}
+@endsection
+
 @section('title')
 MaisVendas - Início
 @endsection
 
 @section('content')
     <h1>Início</h1>
-
+    
     @loggedIn
-        {{ filialLogada.nome }}
-        <p>Bem vindo {{ auth.user.nome }}! <a href="/api/logout">Clique aqui</a> para sair.</p>          
+        <!--{{ filialLogada.nome }}
+        <p>Bem vindo {{ auth.user.nome }}! <a href="/api/logout">Clique aqui</a> para sair.</p>!-->
+        <p id="pBemVindo">Seja bem vindo(a) ao sistema MaisVendas!</p>
     @endloggedIn
 @endsection
