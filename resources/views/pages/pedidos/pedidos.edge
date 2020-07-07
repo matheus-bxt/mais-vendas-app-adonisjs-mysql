@@ -16,9 +16,13 @@ MaisVendas - Pedidos
 
 <p>
     <a href="{{ route('view.cadastrarPedido') }}" type="button" class="btn btn-success">Cadastrar novo pedido</a>
-    <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de pedidos" data-toggle="modal" data-target="#modalRelatorioPedidos">
-        <i class="fas fa-print"></i>
-    </a>   
+
+    @if(auth.user.admin)
+        <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de pedidos" data-toggle="modal" data-target="#modalRelatorioPedidos">
+            <i class="fas fa-print"></i>
+        </a>
+    @endif
+    
     <select id="selectFiltroStatus" onchange="filtrarPedidoPorStatus()" class="form-control" style="width:180px; float:right;" data-placement="right" title="Filtrar pedidos por status">
         <option value="0" selected>Todos</option>
         @each(status in statusPedidos)

@@ -129,6 +129,19 @@ class UserController {
     }
 
     dados.admin = dados.admin == 'on' ? true : false;
+
+    if (dados.admin == false) {
+      var outrosUsuariosAdmin = await User
+      .query()
+      .where('id', '<>', usuario.id)
+      .andWhere('admin', true)
+      .fetch();
+
+      if (outrosUsuariosAdmin.rows.length == 0) {
+        session.flash({updateUsuarioError: 'Não é possível retirar o privilégio de administrador, pois deve existir pelo menos um usuário administrador!'})
+        return response.redirect('back');
+      }
+    }
     
     usuario.merge(dados);
     await usuario.save();

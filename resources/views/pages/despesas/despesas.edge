@@ -16,9 +16,12 @@ MaisVendas - Despesas
 
 <p>
     <a href="{{ route('view.cadastrarDespesa') }}" type="button" class="btn btn-success">Cadastrar nova despesa</a>
-    <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de despesas" data-toggle="modal" data-target="#modalRelatorioDespesas">
-        <i class="fas fa-print"></i>
-    </a>
+
+    @if(auth.user.admin)
+        <a href="" type="button" class="btn btn-secondary" style="margin-left:10px" data-placement="right" title="Relatório de despesas" data-toggle="modal" data-target="#modalRelatorioDespesas">
+            <i class="fas fa-print"></i>
+        </a>
+    @endif
 </p>
 
 @if(flashMessage('openToEditDespesaError'))

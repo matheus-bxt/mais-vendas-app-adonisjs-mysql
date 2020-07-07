@@ -62,6 +62,11 @@ MaisVendas - Alterar Usuário
         <label for="admin">Admin?</label>
         <input type="checkbox" name="admin" id="admin" {{ old('admin') == 'on' ? 'checked' : '' }} {{ usuario.admin == 1 ? 'checked' : '' }}>
 
+        @if(flashMessage('updateUsuarioError'))
+            <br>
+            <span>{{ flashMessage('updateUsuarioError') }}</span>
+        @endif
+
         <button type="submit" class="btn btn-primary">Salvar</button>
     </form>
 </div>
