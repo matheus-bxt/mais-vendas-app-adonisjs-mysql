@@ -47,6 +47,10 @@ command line in terminal VSCode:
 adonis serve --dev
 ```
 
+<<<<<<< HEAD
 ## Open Browser Test
+=======
+## Open Browser
+>>>>>>> 4c94c14398610f5d680612b1bee680ef358bbb7a
 
 http://127.0.0.1:3333/
